@@ -1,0 +1,1512 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة استمارة النشاطات - مديرية تربية المثنى</title>
+    <link rel="icon" type="image/png" href="logo1.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', 'Tahoma', sans-serif; }
+        body { background: #f0f2f5; min-height: 100vh; }
+
+        .main-header { background: #fff; border-bottom: 3px solid #1e3c72; position: sticky; top: 0; z-index: 50; }
+        .header-top { background: #1e3c72; color: #fff; padding: 6px 20px; text-align: center; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .header-main { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 8px 20px; gap: 15px; min-height: 75px; max-width: 1400px; margin: 0 auto; }
+        .header-right { text-align: right; }
+        .header-right h1 { font-size: 20px; color: #1e3c72; margin-bottom: 2px; font-weight: bold; }
+        .header-right h2 { font-size: 14px; color: #2a5298; padding-top: 2px; border-top: 1px solid #ddd; display: inline-block; }
+        .header-logo { text-align: center; padding: 0 10px; }
+        .header-logo img { width: 75px; height: 75px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.15)); transition: transform 0.3s ease; }
+        .header-logo img:hover { transform: scale(1.05); }
+        .header-left { text-align: left; }
+        .header-left h1 { font-size: 18px; color: #1e3c72; margin-bottom: 2px; font-weight: bold; }
+        .header-left h2 { font-size: 13px; color: #2a5298; padding-top: 2px; border-top: 1px solid #ddd; display: inline-block; }
+
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 10px 20px; display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .navbar.show { display: flex; }
+        .nav-links { display: flex; gap: 5px; list-style: none; flex-wrap: wrap; }
+        .nav-links button { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 7px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .nav-links button:hover, .nav-links button.active { background: rgba(255,255,255,0.3); }
+        .user-area { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .user-area button { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .admin-badge { background: gold !important; color: #1e3c72 !important; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin-left: 5px; }
+        .role-badge.user { background: #27ae60 !important; color: #fff !important; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin-left: 5px; }
+
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 180px); padding: 40px 20px; }
+        .login-box { background: #fff; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-header h1 { color: #333; font-size: 22px; margin-bottom: 5px; }
+        .login-header p { color: #777; font-size: 13px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 13px; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #f8f9fa; }
+        .form-group input:focus { outline: none; border-color: #667eea; background: #fff; }
+        .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
+        .error-msg { background: #fee; color: #c33; padding: 8px; border-radius: 6px; margin-top: 10px; text-align: center; font-size: 13px; display: none; }
+
+        .main-content { padding: 20px; max-width: 1500px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-container, .reports-container, .cumulative-container, .admin-container { background: #fff; border-radius: 12px; box-shadow: 0 3px 15px rgba(0,0,0,0.06); padding: 25px; }
+        .form-section-title { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-section-title h2 { font-size: 18px; margin: 0; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-row label { color: #1e3c72; margin-bottom: 6px; font-size: 13px; display: block; padding-bottom: 4px; border-bottom: 1px solid #667eea; }
+        .form-row label .required-star { color: #e74c3c; }
+        .form-row select, .form-row input { width: 100%; padding: 10px 12px; border: 2px solid #1e3c72 !important; border-radius: 8px; font-size: 13px; background: #fff !important; }
+        .form-row select:focus, .form-row input:focus { outline: none; border-color: #8e44ad !important; }
+
+        .table-section { margin-top: 20px; }
+        .table-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .add-row-btn { background: #27ae60; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .table-wrapper { overflow-x: auto; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead { background: #1e3c72; color: #fff; }
+        th { padding: 10px 8px; text-align: center; font-size: 12px; }
+        td { padding: 8px; border-bottom: 1px solid #e0e0e0; text-align: center; font-size: 12px; }
+        tbody input, tbody select, tbody textarea { width: 100%; padding: 6px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 12px; }
+        tbody textarea { resize: vertical; min-height: 30px; }
+        .delete-btn { background: #e74c3c; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+
+        .action-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .action-buttons button { padding: 10px 20px; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; color: #fff; }
+        .save-btn { background: #27ae60; }
+        .print-btn { background: #3498db; }
+        .clear-btn { background: #e67e22; }
+        .word-btn { background: #2a5298; }
+        .excel-btn { background: #16a085; }
+
+        .signature-section { display: none; }
+
+        .stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-right: 3px solid #667eea; }
+        .stat-card.green { border-right-color: #27ae60; }
+        .stat-card.orange { border-right-color: #e67e22; }
+        .stat-card.red { border-right-color: #e74c3c; }
+        .stat-card.purple { border-right-color: #9b59b6; }
+        .stat-card .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+        .stat-card .stat-label { font-size: 12px; color: #777; margin-top: 3px; }
+
+        .admin-container .form-section-title { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); }
+        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .admin-stat-card { background: linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-right: 3px solid #c0392b; }
+        .admin-stat-card .stat-value { color: #c0392b; }
+        .add-user-form { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #c0392b; }
+        .add-user-form h3 { color: #c0392b; margin-bottom: 15px; font-size: 16px; }
+        .export-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .export-btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; color: #fff; }
+        .export-btn.pdf { background: #e74c3c; }
+        .export-btn.excel { background: #27ae60; }
+        .export-btn.print { background: #3498db; }
+        .export-btn.refresh { background: #9b59b6; }
+        .reports-table-wrapper { overflow-x: auto; border-radius: 8px; }
+        .reports-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .reports-table thead { background: #2c3e50; }
+        .reports-table th { padding: 10px 8px; color: #fff; font-size: 12px; }
+        .reports-table td { padding: 10px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; }
+        .admin-table thead { background: #c0392b; }
+        .cumulative-table thead { background: #8e44ad; }
+        .activity-count { display: inline-block; background: #8e44ad; color: #fff; padding: 3px 8px; border-radius: 10px; font-size: 11px; }
+        .participants-sum { color: #27ae60; font-weight: bold; }
+        .btn-view, .btn-delete, .btn-edit, .btn-role-admin, .btn-role-user { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; color: #fff; }
+        .btn-view { background: #3498db; }
+        .btn-edit { background: #f39c12; }
+        .btn-delete { background: #e74c3c; }
+        .btn-role-admin { background: #c0392b; }
+        .btn-role-user { background: #27ae60; }
+        .network-info { background: #e8f5e9; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #2e7d32; }
+        .pulse-dot { display: inline-block; width: 8px; height: 8px; background: #27ae60; border-radius: 50%; margin-left: 5px; }
+        .cumulative-info { background: linear-gradient(135deg, #f4ecf7 0%, #e8d5f0 100%); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; border-right: 3px solid #8e44ad; font-size: 12px; color: #6c3483; }
+        .admin-info { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; border-right: 3px solid #c0392b; font-size: 12px; color: #c62828; }
+        .user-notice { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; border-right: 3px solid #2196f3; font-size: 12px; color: #1565c0; }
+        .notification { position: fixed; top: 200px; left: 50%; transform: translateX(-50%); padding: 12px 25px; border-radius: 8px; color: #fff; z-index: 2000; display: none; }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #3498db; }
+
+        .app-footer { background: #1e3c72; color: #fff; padding: 20px; text-align: center; margin-top: 30px; border-top: 3px solid gold; }
+        .app-footer .footer-content { max-width: 1500px; margin: 0 auto; }
+        .app-footer .footer-title { font-size: 16px; margin-bottom: 6px; }
+        .app-footer .footer-name { font-size: 18px; color: gold; margin: 3px 0; }
+        .app-footer .footer-position { font-size: 14px; color: #b8d4f0; margin-bottom: 8px; }
+        .app-footer .footer-divider { width: 80px; height: 2px; background: gold; margin: 10px auto; }
+        .app-footer .footer-copyright { font-size: 11px; color: #95b3d6; margin-top: 8px; }
+
+        @media (max-width: 768px) {
+            .header-main { grid-template-columns: 1fr; text-align: center; padding: 8px !important; }
+            .header-right, .header-left { text-align: center; }
+            .header-logo img { width: 55px !important; height: 55px !important; }
+        }
+
+        /* ============================================================ */
+        /* ✅ أنماط الطباعة - تقرير نظيف A4 */
+        /* ============================================================ */
+        @media print {
+            @page { size: A4; margin: 1cm 1cm 1cm 1cm; }
+            body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
+
+            #mainNavbar, #userNotice, .add-row-btn, .action-buttons, .export-buttons, .app-footer, .delete-btn, .btn-delete, .header-top, .form-section-title, .logo-ring { display: none !important; }
+
+            .main-content { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+            .form-container, .reports-container, .cumulative-container, .admin-container { box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; background: #fff !important; }
+
+            /* الترويسة - نظيف وواضح */
+            .main-header { position: static !important; box-shadow: none !important; border: 2px solid #000 !important; border-radius: 0 !important; padding: 8px 5px !important; margin-bottom: 5px !important; }
+            .header-main { min-height: 70px !important; padding: 5px 0 !important; gap: 15px !important; }
+            .header-logo img { width: 60px !important; height: 60px !important; }
+            .header-right h1, .header-left h1 { font-size: 13pt !important; color: #000 !important; margin-bottom: 3px !important; }
+            .header-right h2, .header-left h2 { font-size: 11pt !important; color: #000 !important; border-top: 1px solid #000 !important; padding-top: 2px !important; }
+
+            /* حقول النموذج - نظيفة ومرتبة */
+            .form-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; margin-bottom: 5px !important; page-break-inside: avoid !important; }
+            .form-row > div { border: 1px solid #000 !important; padding: 3px 6px !important; background: #fff !important; }
+            .form-row label { font-size: 10pt !important; color: #000 !important; margin-bottom: 2px !important; padding-bottom: 0 !important; border-bottom: 1px dashed #999 !important; display: block !important; }
+            .form-row select, .form-row input { padding: 2px 4px !important; font-size: 11pt !important; border: none !important; background: transparent !important; box-shadow: none !important; color: #000 !important; }
+
+            /* الجدول */
+            .table-section { margin-top: 8px !important; page-break-inside: auto !important; }
+            .table-title { display: none !important; }
+            table { width: 100% !important; border-collapse: collapse !important; min-width: auto !important; font-size: 10pt !important; page-break-inside: auto !important; }
+            tr { page-break-inside: avoid !important; }
+            thead { display: table-header-group !important; -webkit-print-color-adjust: exact !important; }
+            th { background: #d9d9d9 !important; color: #000 !important; border: 1px solid #000 !important; padding: 6px 3px !important; font-size: 10pt !important; font-weight: bold !important; }
+            td { border: 1px solid #000 !important; padding: 5px 3px !important; font-size: 10pt !important; color: #000 !important; }
+            tbody input, tbody select, tbody textarea { border: none !important; padding: 1px !important; font-size: 10pt !important; background: transparent !important; color: #000 !important; }
+
+            /* التوقيعات - مساحة كبيرة */
+            .signature-section { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important; margin-top: 50px !important; padding: 0 10px !important; page-break-inside: avoid !important; }
+            .signature-box { text-align: center; }
+            .signature-box .sig-label { font-size: 11pt !important; color: #000 !important; margin-bottom: 8px !important; }
+            .signature-box .sig-role { font-size: 11pt !important; color: #000 !important; margin-top: 5px !important; font-weight: bold !important; }
+            .signature-box .sig-name { font-size: 11pt !important; color: #000 !important; margin-top: 3px !important; font-weight: bold !important; }
+            .signature-box .sig-line { border-bottom: 2px solid #000 !important; width: 80%; margin: 0 auto 5px; height: 50px !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-top">
+            <div class="datetime" id="currentDateTime">--</div>
+            <div>الجمهورية العراقية - وزارة التربية</div>
+        </div>
+        <div class="header-main">
+            <div class="header-right">
+                <h1>وزارة التربية</h1>
+                <h2>المديرية العامة لتربية المثنى</h2>
+            </div>
+            <div class="header-logo">
+                <div class="logo-ring"></div>
+                <img src="logo1.png" alt="شعار وزارة التربية" onerror="this.style.display='none'">
+            </div>
+            <div class="header-left">
+                <h1>قسم الاعداد والتدريب</h1>
+                <h2>استمارة النشاطات الشهرية</h2>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar" id="mainNavbar">
+        <div class="nav-title">نظام إدارة النشاطات</div>
+        <ul class="nav-links">
+            <li><button class="active" id="navFormBtn" onclick="showPage('formPage')">الاستمارة</button></li>
+            <li><button id="navReportsBtn" onclick="showPage('reportsPage')">التقارير</button></li>
+            <li><button id="navCumulativeBtn" onclick="showPage('cumulativePage')">التقرير التراكمي</button></li>
+            <li><button id="navAdminBtn" class="admin-only" onclick="showPage('adminPage')" style="display:none;">لوحة التحكم</button></li>
+        </ul>
+        <div class="user-area">
+            <span class="user-name"><span id="userRoleBadge"></span><span id="userDisplay">مستخدم</span></span>
+            <button onclick="logout()">خروج</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page active" id="loginPage">
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-header">
+                        <img src="logo1.png" alt="شعار نظام النشاطات" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(30,60,114,0.2));">
+                        <h1>نظام إدارة النشاطات</h1>
+                        <p>الرجاء تسجيل الدخول للمتابعة</p>
+                    </div>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">اسم المستخدم</label>
+                            <input type="text" id="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">كلمة المرور</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button type="submit" class="login-btn">تسجيل الدخول</button>
+                        <div class="error-msg" id="errorMsg">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="formPage">
+            <div class="form-container">
+                <div class="form-section-title"><h2>استمارة النشاطات الشهرية</h2></div>
+                <div class="user-notice" id="userNotice" style="display:none;"><strong>ملاحظة:</strong> حسابك مخصص لتعبئة الاستمارة فقط.</div>
+                <div class="form-row">
+                    <div><label>الشهر <span class="required-star">*</span></label><select id="month"><option value="">-- اختر --</option><option value="يناير">يناير</option><option value="فبراير">فبراير</option><option value="مارس">مارس</option><option value="أبريل">أبريل</option><option value="مايو">مايو</option><option value="يونيو">يونيو</option><option value="يوليو">يوليو</option><option value="أغسطس">أغسطس</option><option value="سبتمبر">سبتمبر</option><option value="أكتوبر">أكتوبر</option><option value="نوفمبر">نوفمبر</option><option value="ديسمبر">ديسمبر</option></select></div>
+                    <div><label>السنة <span class="required-star">*</span></label><select id="year"><option value="">-- اختر --</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select></div>
+                    <div><label>الموظف المسؤول <span class="required-star">*</span></label><select id="employee"><option value="">-- اختر --</option><option value="م.م صفاء هادي">م.م صفاء هادي</option><option value="حمزة جابر علوان">حمزة جابر علوان</option><option value="فاطمة علوان">فاطمة علوان</option><option value="حسين عباس">حسين عباس</option><option value="م.م طاهر طالب">م.م طاهر طالب</option><option value="م.م حسين فالح">م.م حسين فالح</option><option value="ستار عبد اكعيم">ستار عبد اكعيم</option><option value="ضرغام ماجد">ضرغام ماجد</option></select></div>
+                    <div><label>مكان العمل <span class="required-star">*</span></label><select id="workplace"><option value="">-- اختر --</option><option value="مدير القسم">مدير القسم</option><option value="معاون مدير القسم">معاون مدير القسم</option><option value="مكتب رئيس القسم">مكتب رئيس القسم</option><option value="شعبة التدريب">شعبة التدريب</option><option value="شعبة المعاهد">شعبة المعاهد</option><option value="شعبة البحوث والدراسات">شعبة البحوث والدراسات</option><option value="شعبة الاشغال اليدوية">شعبة الاشغال اليدوية</option><option value="وحدة اللغة العربية">وحدة اللغة العربية</option></select></div>
+                </div>
+                <div class="table-section">
+                    <div class="table-title"><h2>جدول النشاطات</h2><button class="add-row-btn" onclick="addRow()">إضافة نشاط جديد</button></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>ت</th><th>النشاط</th><th>التفاصيل</th><th>المشتركين</th><th>جهة التنفيذ</th><th>الجهة المستهدفة</th><th>المرفقات</th><th>التاريخ</th><th>الملاحظات</th><th>إجراء</th></tr></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="signature-section">
+                    <div class="signature-box" style="text-align: right;">
+                        <div class="sig-label">التوقيع</div>
+                        <div class="sig-line"></div>
+                        <div class="sig-role">مسؤول الشعبة</div>
+                    </div>
+                    <div class="signature-box" style="text-align: left;">
+                        <div class="sig-label">التوقيع</div>
+                        <div class="sig-line"></div>
+                        <div class="sig-role">مدير القسم</div>
+                        <div class="sig-name">م.م صفاء هادي عبد العالي</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="save-btn" onclick="saveForm()">حفظ الاستمارة</button>
+                    <button class="print-btn" onclick="window.print()">طباعة</button>
+                    <button class="word-btn" onclick="exportWord()">تصدير Word</button>
+                    <button class="excel-btn" onclick="exportFormExcel()">تصدير Excel</button>
+                    <button class="export-json-btn" onclick="exportFormJSON()" style="background:#8e44ad;">تصدير كملف بيانات (JSON)</button>
+                    <button class="clear-btn" onclick="clearForm()">مسح البيانات</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="reportsPage">
+            <div class="reports-container">
+                <div class="form-section-title"><h2>التقارير والحركات</h2></div>
+                <div class="network-info"><span>مشاركة تلقائية للبيانات</span><span><span class="pulse-dot"></span> متصل</span></div>
+                <div class="stats-cards">
+                    <div class="stat-card"><div class="stat-value" id="totalRecords">0</div><div class="stat-label">إجمالي</div></div>
+                    <div class="stat-card green"><div class="stat-value" id="activeRecords">0</div><div class="stat-label">نشطة</div></div>
+                    <div class="stat-card orange"><div class="stat-value" id="expiringSoon">0</div><div class="stat-label">قارب الانتهاء</div></div>
+                    <div class="stat-card red"><div class="stat-value" id="expiredRecords">0</div><div class="stat-label">منتهية</div></div>
+                </div>
+                <div class="export-buttons">
+                    <button class="export-btn pdf" onclick="exportPDF()">PDF</button>
+                    <button class="export-btn excel" onclick="exportExcel()">Excel</button>
+                    <button class="export-btn refresh" onclick="loadReports(true)">تحديث</button>
+                    <button class="export-btn import" onclick="triggerImportJSON()" style="background:#e67e22;">استيراد ملف استمارة (JSON)</button>
+                    <input type="file" id="importJsonInput" accept=".json" style="display:none;" onchange="importFormJSON(event)">
+                </div>
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead><tr><th>#</th><th>التاريخ</th><th>الموظف</th><th>مكان العمل</th><th>الشهر/السنة</th><th>الأنشطة</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="reportsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="cumulativePage">
+            <div class="cumulative-container">
+                <div class="form-section-title" style="background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);"><h2>التقرير التراكمي</h2></div>
+                <div class="cumulative-info"><strong>يجمع جميع النشاطات من الموظفين</strong></div>
+                <div class="stats-cards">
+                    <div class="stat-card purple"><div class="stat-value" id="totalUniqueActivities">0</div><div class="stat-label">أنشطة فريدة</div></div>
+                    <div class="stat-card green"><div class="stat-value" id="totalActivitiesCount">0</div><div class="stat-label">إجمالي التكرار</div></div>
+                    <div class="stat-card orange"><div class="stat-value" id="totalParticipants">0</div><div class="stat-label">المشاركين</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalEmployees">0</div><div class="stat-label">الموظفين</div></div>
+                </div>
+                <div class="export-buttons">
+                    <button class="export-btn pdf" onclick="exportCumulativePDF()">PDF</button>
+                    <button class="export-btn excel" onclick="exportCumulativeExcel()">Excel</button>
+                    <button class="export-btn print" onclick="printCumulativeReport()">طباعة</button>
+                    <button class="export-btn refresh" onclick="loadCumulativeReport(true)" style="background:#9b59b6;">تحديث</button>
+                </div>
+                <div class="reports-table-wrapper">
+                    <table class="reports-table cumulative-table">
+                        <thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="cumulativeTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="adminPage">
+            <div class="admin-container">
+                <div class="form-section-title"><h2>لوحة تحكم الأدمن</h2></div>
+                <div class="admin-info"><strong>منطقة محظورة:</strong> صفحة للأدمن فقط.</div>
+                <div class="admin-stats">
+                    <div class="admin-stat-card"><div class="stat-value" id="totalUsers">0</div><div class="stat-label">إجمالي المستخدمين</div></div>
+                    <div class="admin-stat-card"><div class="stat-value" id="totalAdmins">0</div><div class="stat-label">المسؤولون</div></div>
+                    <div class="admin-stat-card"><div class="stat-value" id="totalNormalUsers">0</div><div class="stat-label">المستخدمون</div></div>
+                </div>
+                <div class="add-user-form">
+                    <h3>إضافة مستخدم جديد</h3>
+                    <div class="form-row" style="margin-bottom: 0;">
+                        <div><label>اسم المستخدم *</label><input type="text" id="newUsername"></div>
+                        <div><label>كلمة المرور *</label><input type="text" id="newPassword"></div>
+                        <div><label>الصلاحية *</label><select id="newUserRole"><option value="user">مستخدم</option><option value="admin">أدمن</option></select></div>
+                        <div style="display: flex; align-items: end; gap: 5px;">
+                            <button onclick="generateCredentials()" style="padding:10px; background:#3498db; color:#fff; border:none; border-radius:8px; cursor:pointer;">توليد تلقائي</button>
+                            <button onclick="addNewUser()" style="padding:10px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer;">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-user-form" style="border-color: #8e44ad;">
+                    <h3 style="color: #8e44ad;">إعدادات الربط بجوجل شيت (Google Sheets)</h3>
+                    <div class="form-row" style="margin-bottom: 0; grid-template-columns: 1fr auto auto; gap: 10px;">
+                        <div><label>رابط Google Apps Script Web App URL</label><input type="text" id="googleScriptUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+                        <div style="display: flex; align-items: end;"><button onclick="saveGoogleScriptUrl()" style="width:100%; padding:10px; background:#8e44ad; color:#fff; border:none; border-radius:8px; cursor:pointer;">حفظ الرابط</button></div>
+                        <div style="display: flex; align-items: end;"><button onclick="downloadUpdatedHtml()" style="width:100%; padding:10px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer;">حفظ وتنزيل نسخة للمستخدمين</button></div>
+                    </div>
+                    <p style="font-size: 11px; color: #666; margin-top: 8px;">ملاحظة: سيتم إرسال كل استمارة جديدة تُحفظ تلقائياً إلى ملف جوجل شيت المرتبط بهذا الرابط. استخدم زر "حفظ وتنزيل نسخة للمستخدمين" للحصول على ملف <code>index.html</code> جاهز ومعد لديهم مباشرة.</p>
+                </div>
+                <div class="reports-table-wrapper">
+                    <table class="reports-table admin-table">
+                        <thead><tr><th>#</th><th>المستخدم</th><th>كلمة المرور</th><th>الصلاحية</th><th>تاريخ الإضافة</th><th>أُضيف بواسطة</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-title">برمجة وتصميم</div>
+            <div class="footer-name">م.م صفاء هادي عبد العالي</div>
+            <div class="footer-position">مدير قسم الاعداد والتدريب</div>
+            <div class="footer-divider"></div>
+            <div class="footer-copyright">© 2026 - جميع الحقوق محفوظة - مديرية تربية المثنى - وزارة التربية</div>
+        </div>
+    </footer>
+
+    <script>
+        function initializeDefaultUsers() {
+            let users = {};
+            try {
+                users = JSON.parse(localStorage.getItem('systemUsers') || '{}');
+            } catch (e) {
+                users = {};
+            }
+
+            const defaultUsers = {
+                'admin': { password: 'SA@@2026##ra', role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'user': { password: 'user@159', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'hossin.f': { password: 'hos@789', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'taher.t': { password: 'taher@123', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'fatima.a': { password: 'fatima#753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'hamza.j': { password: 'hamza@159', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'staar.a': { password: 'sataar753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'drgham': { password: 'drgham@@753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' }
+            };
+
+            // تنظيف الحسابات المعكوسة القديمة
+            const badKeys = ['user@159', 'hos@789', 'bohuth123', 'baneen#753', 'hamza@159', 'sataar753', 'drgham@@753'];
+            badKeys.forEach(k => {
+                if (users[k] && users[k].createdBy === 'system') {
+                    delete users[k];
+                }
+            });
+
+            let updated = true; // Force save to persist cleanup
+            for (let key in defaultUsers) {
+                // فقط أضف المستخدم إذا لم يكن موجوداً أصلاً - لا تُعد كتابة التغييرات التي أجراها الأدمن
+                if (!users[key]) {
+                    users[key] = defaultUsers[key];
+                    updated = true;
+                }
+            }
+
+            if (updated || !localStorage.getItem('systemUsers')) {
+                localStorage.setItem('systemUsers', JSON.stringify(users));
+            }
+        }
+        // ترحيل لمرة واحدة: مسح بيانات المستخدمين القديمة التي كانت تُعاد كتابتها في كل تحميل
+        if (!localStorage.getItem('usersFixApplied_v2')) {
+            localStorage.removeItem('systemUsers');
+            localStorage.setItem('usersFixApplied_v2', 'true');
+        }
+        initializeDefaultUsers();
+
+        function getUsers() { return JSON.parse(localStorage.getItem('systemUsers') || '{}'); }
+        function saveUsers(users) { localStorage.setItem('systemUsers', JSON.stringify(users)); }
+
+        function authenticateUser(u, p) {
+            const users = getUsers();
+            if (!users[u]) return { success: false, message: 'اسم المستخدم غير موجود' };
+            if (users[u].password !== p) return { success: false, message: 'كلمة المرور غير صحيحة' };
+            return { success: true, user: u, role: users[u].role };
+        }
+
+        let currentUser = '', currentUserRole = '', rowCount = 0;
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            if (!u || !p) {
+                document.getElementById('errorMsg').textContent = 'الرجاء إدخال اسم المستخدم وكلمة المرور';
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            const r = authenticateUser(u, p);
+            if (r.success) {
+                currentUser = r.user; currentUserRole = r.role;
+                localStorage.setItem('currentUser', currentUser);
+                localStorage.setItem('currentUserRole', currentUserRole);
+                document.getElementById('userDisplay').textContent = currentUser;
+                document.getElementById('errorMsg').style.display = 'none';
+                if (currentUserRole === 'admin') {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="admin-badge">أدمن</span>';
+                    document.getElementById('navAdminBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="role-badge user">مستخدم</span>';
+                    document.getElementById('navAdminBtn').style.display = 'none';
+                }
+                document.getElementById('mainNavbar').classList.add('show');
+                showPage('formPage');
+                if (rowCount === 0) addRow();
+                loadReports();
+                showNotification('مرحباً ' + currentUser, 'success');
+            } else {
+                document.getElementById('errorMsg').textContent = r.message;
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+
+        function showPage(pageId) {
+            if (pageId === 'adminPage' || pageId === 'reportsPage' || pageId === 'cumulativePage') {
+                if (currentUserRole !== 'admin') { showNotification('ليس لديك صلاحية!', 'error'); return; }
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            ['navFormBtn', 'navReportsBtn', 'navCumulativeBtn', 'navAdminBtn'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+            if (pageId === 'formPage') { document.getElementById('navFormBtn').classList.add('active'); updateUserNotice(); }
+            else if (pageId === 'reportsPage') { document.getElementById('navReportsBtn').classList.add('active'); loadReports(); }
+            else if (pageId === 'cumulativePage') { document.getElementById('navCumulativeBtn').classList.add('active'); setTimeout(() => loadCumulativeReport(), 50); }
+            else if (pageId === 'adminPage') { document.getElementById('navAdminBtn').classList.add('active'); loadUsers(); }
+        }
+
+        function updateUserNotice() {
+            const el = document.getElementById('userNotice');
+            if (el) el.style.display = (currentUserRole === 'user') ? 'block' : 'none';
+        }
+
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج من النظام؟')) {
+                currentUser = ''; currentUserRole = '';
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUserRole');
+                document.getElementById('mainNavbar').classList.remove('show');
+                document.getElementById('navAdminBtn').style.display = 'none';
+                showPage('loginPage');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                clearForm();
+            }
+        }
+
+        function loadUsers() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            loadGoogleScriptUrl();
+            const users = getUsers();
+            const tbody = document.getElementById('usersTableBody');
+            let admins = 0, normals = 0;
+            const arr = Object.keys(users).map(u => ({ username: u, ...users[u] }));
+            arr.forEach(u => u.role === 'admin' ? admins++ : normals++);
+            document.getElementById('totalUsers').textContent = arr.length;
+            document.getElementById('totalAdmins').textContent = admins;
+            document.getElementById('totalNormalUsers').textContent = normals;
+            tbody.innerHTML = '';
+            arr.forEach((user, i) => {
+                const isMe = user.username === currentUser;
+                const isSys = user.createdBy === 'system';
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><strong>' + user.username + '</strong> ' + (isMe ? '<span style="color:#27ae60;">(أنت)</span>' : '') + '</td>' +
+                    '<td><code style="background:#f1f2f6; padding:3px 6px; border-radius:4px; font-family:monospace; font-size:12px; color:#c0392b;">' + user.password + '</code></td>' +
+                    '<td><span style="background:' + (user.role === 'admin' ? '#c0392b' : '#27ae60') + '; color:#fff; padding:3px 8px; border-radius:10px; font-size:10px;">' + (user.role === 'admin' ? 'أدمن' : 'مستخدم') + '</span></td>' +
+                    '<td>' + new Date(user.createdAt).toLocaleDateString('ar-IQ') + '</td>' +
+                    '<td>' + (user.createdBy || '-') + '</td>' +
+                    '<td>' +
+                        '<button class="btn-edit" onclick="changePassword(\'' + user.username + '\')">تغيير كلمة المرور</button> ' +
+                        (user.username !== 'admin' ? '<button class="' + (user.role === 'admin' ? 'btn-role-user' : 'btn-role-admin') + '" onclick="toggleUserRole(\'' + user.username + '\')">' + (user.role === 'admin' ? 'تحويل لمستخدم' : 'تحويل لأدمن') + '</button> ' : '') +
+                        (!isSys && user.username !== 'admin' ? '<button class="btn-delete" onclick="deleteUser(\'' + user.username + '\')">حذف</button>' : '') +
+                    '</td>' +
+                '</tr>';
+            });
+        }
+
+        function generateCredentials() {
+            const usernames = ['user', 'admin', 'editor', 'member', 'training', 'research', 'art', 'office'];
+            const randomUser = usernames[Math.floor(Math.random() * usernames.length)] + '@' + Math.floor(100 + Math.random() * 900);
+            
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            let randomPass = '';
+            for (let i = 0; i < 10; i++) {
+                randomPass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            document.getElementById('newUsername').value = randomUser;
+            document.getElementById('newPassword').value = randomPass;
+            showNotification('تم توليد اسم مستخدم وكلمة مرور عشوائية', 'info');
+        }
+
+        function syncUserWithGoogleSheets(userData) {
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'ضع_رابط_جوجل_شيت_هنا') return;
+
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(userData)
+            })
+            .catch(err => {
+                console.error('Error syncing user with Google Sheets:', err);
+                showNotification('خطأ في مزامنة الحساب مع جوجل شيت', 'error');
+            });
+        }
+
+        function addNewUser() {
+            if (currentUserRole !== 'admin') return;
+            const u = document.getElementById('newUsername').value.trim();
+            const p = document.getElementById('newPassword').value.trim();
+            const r = document.getElementById('newUserRole').value;
+            if (!u || !p) { showNotification('املأ الحقول!', 'error'); return; }
+            if (u.length < 3 || p.length < 4) { showNotification('القيم قصيرة جداً!', 'error'); return; }
+            
+            const users = getUsers();
+            if (users[u]) { showNotification('المستخدم موجود مسبقاً!', 'error'); return; }
+            users[u] = { password: p, role: r, createdAt: new Date().toISOString(), createdBy: currentUser };
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'saveUser', username: u, password: p, role: r, createdBy: currentUser });
+
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            loadUsers();
+            showNotification('تم إضافة "' + u + '" ومزامنته', 'success');
+        }
+
+        function deleteUser(u) {
+            if (u === 'admin' || u === currentUser) { showNotification('لا يمكن الحذف!', 'error'); return; }
+            if (!confirm('حذف "' + u + '"؟')) return;
+            
+            const users = getUsers();
+            delete users[u];
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'deleteUser', username: u });
+
+            loadUsers();
+            showNotification('تم الحذف ومزامنة التغيير', 'success');
+        }
+
+        function toggleUserRole(u) {
+            if (u === 'admin') return;
+            const users = getUsers();
+            users[u].role = users[u].role === 'admin' ? 'user' : 'admin';
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'saveUser', username: u, password: users[u].password, role: users[u].role, createdBy: users[u].createdBy });
+
+            loadUsers();
+            showNotification('تم تغيير الصلاحية ومزامنتها', 'success');
+        }
+
+        function changePassword(u) {
+            const p = prompt('كلمة مرور جديدة لـ "' + u + '":');
+            if (!p || p.length < 4) { showNotification('كلمة المرور قصيرة!', 'error'); return; }
+            
+            const users = getUsers();
+            users[u].password = p;
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'saveUser', username: u, password: p, role: users[u].role, createdBy: users[u].createdBy });
+
+            showNotification('تم تغيير كلمة المرور ومزامنتها', 'success');
+            loadUsers(); // تحديث الجدول فوراً
+        }
+
+        function addRow() {
+            rowCount++;
+            const tbody = document.getElementById('tableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + rowCount + '</td>' +
+                '<td><input type="text" placeholder="اسم النشاط" class="activity-name"></td>' +
+                '<td><textarea placeholder="التفاصيل" class="activity-details"></textarea></td>' +
+                '<td><input type="number" min="0" placeholder="0" class="participants"></td>' +
+                '<td><input type="text" placeholder="جهة التنفيذ" class="executor"></td>' +
+                '<td><input type="text" placeholder="الجهة المستهدفة" class="target"></td>' +
+                '<td><input type="text" placeholder="المرفقات" class="attachments"></td>' +
+                '<td><input type="date" class="activity-date"></td>' +
+                '<td><textarea placeholder="الملاحظات" class="notes"></textarea></td>' +
+                '<td><button class="delete-btn" onclick="deleteRow(this)">حذف</button></td>';
+            tbody.appendChild(tr);
+        }
+
+        function deleteRow(btn) { if (confirm('حذف هذا النشاط؟')) btn.closest('tr').remove(); }
+
+        function getFormData() {
+            const m = document.getElementById('month').value;
+            const y = document.getElementById('year').value;
+            const e = document.getElementById('employee').value;
+            const w = document.getElementById('workplace').value;
+            const acts = [];
+            document.querySelectorAll('#tableBody tr').forEach((row, i) => {
+                const name = row.querySelector('.activity-name').value;
+                if (name && name.trim()) {
+                    acts.push({
+                        t: i + 1, name: name.trim(),
+                        details: row.querySelector('.activity-details').value,
+                        participants: parseInt(row.querySelector('.participants').value) || 0,
+                        executor: row.querySelector('.executor').value,
+                        target: row.querySelector('.target').value,
+                        attachments: row.querySelector('.attachments').value,
+                        date: row.querySelector('.activity-date').value,
+                        notes: row.querySelector('.notes').value
+                    });
+                }
+            });
+            return { m, y, e, w, acts };
+        }
+
+        async function saveForm() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ جميع الحقول المطلوبة!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+            
+            showNotification('جاري المزامنة والتحقق من السجلات السابقة...', 'info');
+            
+            // جلب أحدث البيانات من جوجل شيت لضمان التراكم الصحيح عبر جميع المستخدمين
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true); // جلب مباشر مع تفريغ الكاش
+            } catch (e) {
+                console.error("Failed to fetch latest records, using local storage", e);
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+            
+            const now = new Date();
+            const idx = records.findIndex(r => r.month === data.m && r.year === data.y && r.employee === data.e && r.workplace === data.w);
+            let finalRecord;
+            if (idx !== -1) {
+                finalRecord = records[idx];
+                const currentLength = finalRecord.activities ? finalRecord.activities.length : 0;
+                // التأكد من أن الترقيم تتابعي للأنشطة الجديدة المضافة
+                const newActs = data.acts.map((a, i) => ({ ...a, t: currentLength + i + 1 }));
+                finalRecord.activities = (finalRecord.activities || []).concat(newActs);
+                finalRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                finalRecord.updatedBy = currentUser;
+                finalRecord.timestamp = now.getTime();
+                
+                // تحديث السجلات محلياً
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                showNotification('تمت إضافة الأنشطة تراكمياً بنجاح: ' + data.acts.length + ' نشاط جديد', 'success');
+            } else {
+                finalRecord = {
+                    id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                    timestamp: now.getTime(), date: now.toLocaleString('ar-IQ'),
+                    month: data.m, year: data.y, employee: data.e, workplace: data.w,
+                    activities: data.acts, savedBy: currentUser,
+                    expiryDate: now.getTime() + (31 * 24 * 60 * 60 * 1000)
+                };
+                records.push(finalRecord);
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                showNotification('تم حفظ الاستمارة الجديدة بنجاح', 'success');
+            }
+            
+            // مزامنة البيانات تلقائياً مع جوجل شيت إذا كان الرابط مهيأً
+            sendToGoogleSheets(finalRecord);
+            
+            // تحديث شاشة التقارير
+            loadReports(true);
+            
+            // تفريغ الجدول لتجنب التكرار في الحفظ القادم
+            clearTableOnly();
+        }
+
+        function clearTableOnly() {
+            document.getElementById('tableBody').innerHTML = '';
+            rowCount = 0;
+            addRow();
+        }
+
+        // ضع رابط Google Apps Script الخاص بك هنا بين علامتي الاقتباس ليكون افتراضياً للجميع
+        const DEFAULT_GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn_8S98Tqpud0xSANRP9vVpy0oL7YGZPwFEY45fjfrGyhwJAOhiUL8znA5eJf0mtXV/exec';
+
+        // إرسال البيانات إلى Google Sheets عبر Apps Script Web App
+        function sendToGoogleSheets(recordData) {
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'ضع_رابط_جوجل_شيت_هنا') return; // غير مهيأ
+
+            showNotification('جاري مزامنة الاستمارة مع جوجل شيت...', 'info');
+
+            // نستخدم mode: 'no-cors' لأن جوجل يقوم بإعادة توجيه الطلب (Redirect 302) مما يسبب خطأ CORS في المتصفح رغم وصول البيانات.
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(recordData)
+            })
+            .then(() => {
+                // مع no-cors ستكون الاستجابة opaque والوصول ناجح دائماً لجوجل شيت
+                showNotification('تمت المزامنة مع جوجل شيت بنجاح', 'success');
+            })
+            .catch(err => {
+                console.error('Error syncing with Google Sheets:', err);
+                showNotification('حدث خطأ أثناء الاتصال بجوجل شيت', 'error');
+            });
+        }
+
+        // جلب البيانات من Google Sheets
+        let isFetchingSheets = false;
+        async function fetchFromGoogleSheets(force = false) {
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'ضع_رابط_جوجل_شيت_هنا') {
+                return JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const cacheKey = 'sheets_data_cache';
+            const cacheTimeKey = 'sheets_data_cache_time';
+            const cachedData = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+            const now = Date.now();
+
+            // استخدام الكاش إذا كان صالحاً (30 ثانية) ولم يتم طلب التحديث الإجباري
+            if (!force && cachedData && cachedTime && (now - parseInt(cachedTime) < 30000)) {
+                return JSON.parse(cachedData);
+            }
+
+            if (isFetchingSheets) {
+                return cachedData ? JSON.parse(cachedData) : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            isFetchingSheets = true;
+            try {
+                const response = await fetch(scriptUrl);
+                if (!response.ok) throw new Error('Response error');
+                const data = await response.json();
+                
+                // التوافق مع الهيكل الجديد (كائن يحتوي على السجلات والمستخدمين)
+                if (data && data.records && data.users) {
+                    // حفظ المستخدمين المزامنين من جوجل شيت
+                    localStorage.setItem('systemUsers', JSON.stringify(data.users));
+                    
+                    localStorage.setItem(cacheKey, JSON.stringify(data.records));
+                    localStorage.setItem(cacheTimeKey, now.toString());
+                    
+                    let localRecords = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+                    let merged = mergeRecords(localRecords, data.records);
+                    localStorage.setItem('sharedRecords', JSON.stringify(merged));
+                    
+                    isFetchingSheets = false;
+                    return merged;
+                }
+                // التوافق التراجعي مع الهيكل القديم (إذا لم يتم تحديث Apps Script بعد)
+                else if (Array.isArray(data)) {
+                    localStorage.setItem(cacheKey, JSON.stringify(data));
+                    localStorage.setItem(cacheTimeKey, now.toString());
+                    
+                    let localRecords = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+                    let merged = mergeRecords(localRecords, data);
+                    localStorage.setItem('sharedRecords', JSON.stringify(merged));
+                    
+                    isFetchingSheets = false;
+                    return merged;
+                }
+            } catch (err) {
+                console.error('Error fetching from Google Sheets:', err);
+                isFetchingSheets = false;
+                return JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+            isFetchingSheets = false;
+            return JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+        }
+
+        // دمج السجلات المحلية مع سجلات جوجل شيت لمنع التكرار وترتيبها بالوقت
+        function mergeRecords(local, remote) {
+            const map = {};
+            remote.forEach(r => { if (r.id) map[r.id] = r; });
+            local.forEach(r => { 
+                if (r.id) {
+                    if (!map[r.id] || (r.timestamp || 0) >= (map[r.id].timestamp || 0)) {
+                        map[r.id] = r; 
+                    }
+                }
+            });
+            return Object.values(map).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        }
+
+        function saveGoogleScriptUrl() {
+            const url = document.getElementById('googleScriptUrl').value.trim();
+            localStorage.setItem('googleScriptUrl', url);
+            showNotification('تم حفظ رابط جوجل شيت بنجاح', 'success');
+        }
+
+        function downloadUpdatedHtml() {
+            const url = document.getElementById('googleScriptUrl').value.trim();
+            if (!url) {
+                showNotification('يرجى إدخال رابط جوجل شيت أولاً!', 'error');
+                return;
+            }
+            
+            // حفظ الرابط محلياً أولاً
+            localStorage.setItem('googleScriptUrl', url);
+            
+            // دالة مساعدة لتنزيل الملف
+            function triggerDownload(htmlContent) {
+                const regex = /const DEFAULT_GOOGLE_SCRIPT_URL = '.*?';/;
+                let updatedHtml = htmlContent.replace(regex, `const DEFAULT_GOOGLE_SCRIPT_URL = '${url}';`);
+                
+                const blob = new Blob(['\ufeff' + updatedHtml], { type: 'text/html;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'index.html';
+                link.click();
+                showNotification('تم حفظ الرابط وتنزيل ملف index.html المحدث. يرجى توزيعه على المستخدمين.', 'success');
+            }
+            
+            showNotification('جاري توليد ملف التحديث للمستخدمين...', 'info');
+            
+            // محاولة جلب كود الملف الأصلي عبر fetch
+            fetch(window.location.href)
+            .then(res => {
+                if (!res.ok) throw new Error('CORS or network error');
+                return res.text();
+            })
+            .then(html => {
+                triggerDownload(html);
+            })
+            .catch(err => {
+                console.warn('Fetch failed, falling back to outerHTML:', err);
+                // في حال الفشل (مثل قيود CORS للملفات المحلية file://) نستخدم outerHTML كبديل
+                const docHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                triggerDownload(docHtml);
+            });
+        }
+
+        function loadGoogleScriptUrl() {
+            let url = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (url === 'ضع_رابط_جوجل_شيت_هنا') url = '';
+            const el = document.getElementById('googleScriptUrl');
+            if (el) el.value = url;
+        }
+
+        function clearForm() {
+            if (confirm('مسح جميع البيانات؟')) {
+                document.getElementById('month').value = '';
+                document.getElementById('year').value = '';
+                document.getElementById('employee').value = '';
+                document.getElementById('workplace').value = '';
+                document.getElementById('tableBody').innerHTML = '';
+                rowCount = 0;
+                addRow();
+            }
+        }
+
+        // ✅✅✅ تصدير Word - نظيف A4 مع 2 توقيع ✅✅✅
+        function exportWord() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ البيانات أولاً!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+
+            const totalParticipants = data.acts.reduce((sum, a) => sum + (parseInt(a.participants) || 0), 0);
+            const today = new Date();
+            const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+            let rowsHtml = '';
+            data.acts.forEach((a, i) => {
+                rowsHtml += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + (a.name || '') + '</td>' +
+                    '<td>' + (a.details || '') + '</td>' +
+                    '<td>' + (a.participants || '') + '</td>' +
+                    '<td>' + (a.executor || '') + '</td>' +
+                    '<td>' + (a.target || '') + '</td>' +
+                    '<td>' + (a.attachments || '') + '</td>' +
+                    '<td>' + (a.date || '') + '</td>' +
+                    '<td>' + (a.notes || '') + '</td>' +
+                '</tr>';
+            });
+
+            const content = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="UTF-8">' +
+                '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->' +
+                '<style>' +
+                '@page { size: A4; margin: 1.2cm 1cm; }' +
+                'body { font-family: "Arial", "Tahoma", sans-serif; direction: rtl; font-size: 11pt; margin: 0; padding: 0; color: #000; background: #fff; }' +
+                '* { box-sizing: border-box; }' +
+                '.doc { padding: 6px; }' +
+
+                // الترويسة
+                '.header { padding-bottom: 6px; margin-bottom: 5px; }' +
+                '.header table { width: 100%; border-collapse: collapse; }' +
+                '.header td { vertical-align: middle; padding: 2px; }' +
+                '.header .right { text-align: right; width: 38%; font-size: 11pt; font-weight: bold; }' +
+                '.header .center { text-align: center; width: 24%; }' +
+                '.header .left { text-align: left; width: 38%; font-size: 11pt; font-weight: bold; }' +
+                '.header h1 { margin: 0; font-size: 12pt; color: #000; line-height: 1.4; }' +
+                '.header h2 { margin: 0; font-size: 11pt; color: #000; line-height: 1.4; font-weight: normal; }' +
+                '.logo { width: 70px; height: 70px; object-fit: contain; }' +
+
+                // سطر العدد والتاريخ
+                '.meta-row { width: 100%; margin-bottom: 15px; }' +
+                '.meta-table { width: 100%; border-collapse: collapse; }' +
+                '.meta-table td { border: none !important; font-size: 11pt; font-weight: bold; padding: 4px 0; }' +
+
+                // المعلومات
+                '.info { margin-bottom: 10px; }' +
+                '.info table { width: 100%; border-collapse: collapse; }' +
+                '.info td { border: 1px solid #000; padding: 5px 8px; font-size: 11pt; }' +
+                '.info .lbl { background: #e8e8e8; text-align: center; font-weight: bold; }' +
+                '.info .val { text-align: center; }' +
+
+                // الجدول
+                '.main-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }' +
+                '.main-table th { background: #d9d9d9; border: 1px solid #000; padding: 6px 3px; font-size: 10pt; text-align: center; font-weight: bold; }' +
+                '.main-table td { border: 1px solid #000; padding: 5px 3px; font-size: 10pt; text-align: center; vertical-align: middle; }' +
+
+                // التوقيعات
+                '.signatures { margin-top: 80px; padding: 0 5px; }' +
+                '.sig-table { width: 100%; border-collapse: collapse; }' +
+                '.sig-table td { width: 50%; text-align: center; padding: 5px; vertical-align: top; border: none; }' +
+                '.sig-lbl { font-size: 11pt; margin-bottom: 15px; font-weight: bold; }' +
+                '.sig-role { font-size: 11pt; margin-top: 15px; font-weight: bold; }' +
+                '.sig-name { font-size: 11pt; margin-top: 5px; font-weight: bold; }' +
+
+                '</style></head><body>' +
+                '<div class="doc">' +
+
+                // الترويسة مع اللوغو في المنتصف
+                '<div class="header">' +
+                    '<table>' +
+                        '<tr>' +
+                            '<td class="right">' +
+                                '<h1>وزارة التربية</h1>' +
+                                '<h2>المديرية العامة لتربية المثنى</h2>' +
+                            '</td>' +
+                            '<td class="center">' +
+                                '<img class="logo" src="logo1.png" alt="اللوغو" />' +
+                            '</td>' +
+                            '<td class="left">' +
+                                '<h1>قسم الاعداد والتدريب</h1>' +
+                                '<h2>استمارة النشاطات الشهرية</h2>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                // سطر العدد والتاريخ
+                '<div class="meta-row">' +
+                    '<table class="meta-table">' +
+                        '<tr>' +
+                            '<td style="text-align: right; width: 50%;">العدد:</td>' +
+                            '<td style="text-align: left; width: 50%;">التاريخ: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;' + data.y + '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                // المعلومات
+                '<div class="info">' +
+                    '<table>' +
+                        '<tr>' +
+                            '<td class="lbl" style="width:12%;">الشهر</td>' +
+                            '<td class="val" style="width:21%;">' + data.m + '</td>' +
+                            '<td class="lbl" style="width:12%;">السنة</td>' +
+                            '<td class="val" style="width:21%;">' + data.y + '</td>' +
+                            '<td class="lbl" style="width:12%;">العدد</td>' +
+                            '<td class="val">' + data.acts.length + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td class="lbl">الموظف</td>' +
+                            '<td colspan="3">' + data.e + '</td>' +
+                            '<td class="lbl">مكان العمل</td>' +
+                            '<td>' + data.w + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td class="lbl">تاريخ الإصدار</td>' +
+                            '<td class="val">' + todayStr + '</td>' +
+                            '<td class="lbl">إجمالي المشتركين</td>' +
+                            '<td class="val">' + totalParticipants + '</td>' +
+                            '<td class="lbl">مجموع النشاطات</td>' +
+                            '<td class="val">' + data.acts.length + '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                // الجدول
+                '<table class="main-table">' +
+                    '<thead>' +
+                        '<tr>' +
+                            '<th style="width:4%;">ت</th>' +
+                            '<th style="width:14%;">النشاط</th>' +
+                            '<th style="width:14%;">التفاصيل</th>' +
+                            '<th style="width:7%;">المشتركين</th>' +
+                            '<th style="width:12%;">جهة التنفيذ</th>' +
+                            '<th style="width:12%;">الجهة المستهدفة</th>' +
+                            '<th style="width:10%;">المرفقات</th>' +
+                            '<th style="width:10%;">التاريخ</th>' +
+                            '<th style="width:17%;">الملاحظات</th>' +
+                        '</tr>' +
+                    '</thead>' +
+                    '<tbody>' + rowsHtml + '</tbody>' +
+                '</table>' +
+
+                // التوقيعات - بدون خطوط
+                '<div class="signatures">' +
+                    '<table class="sig-table">' +
+                        '<tr>' +
+                            '<td>' +
+                                '<div class="sig-lbl">التوقيع :</div>' +
+                                '<div class="sig-role">مسؤول الشعبة</div>' +
+                            '</td>' +
+                            '<td>' +
+                                '<div class="sig-lbl">التوقيع :</div>' +
+                                '<div class="sig-role">مدير القسم</div>' +
+                                '<div class="sig-name">م.م صفاء هادي عبد العالي</div>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                '</div>' +
+                '</body></html>';
+
+            const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'استمارة_' + data.m + '_' + data.y + '_' + data.acts.length + 'نشاط.doc';
+            link.click();
+            showNotification('تم تصدير الاستمارة بنجاح', 'success');
+        }
+
+        function exportFormExcel() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ البيانات أولاً!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+            const totalParticipants = data.acts.reduce((sum, a) => sum + (parseInt(a.participants) || 0), 0);
+            const today = new Date();
+            const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+            let csv = '\uFEFF';
+            csv += 'وزارة التربية - المديرية العامة لتربية المثنى\n';
+            csv += 'قسم الاعداد والتدريب - استمارة النشاطات الشهرية\n\n';
+            csv += 'الشهر,' + data.m + ',السنة,' + data.y + ',العدد,' + data.acts.length + '\n';
+            csv += 'الموظف,' + data.e + '\n';
+            csv += 'مكان العمل,' + data.w + '\n';
+            csv += 'تاريخ الإصدار,' + todayStr + ',إجمالي المشتركين,' + totalParticipants + '\n\n';
+            csv += 'ت,النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+            data.acts.forEach((a, i) => {
+                csv += (i + 1) + ',';
+                csv += '"' + a.name + '",';
+                csv += '"' + a.details + '",';
+                csv += a.participants + ',';
+                csv += '"' + a.executor + '",';
+                csv += '"' + a.target + '",';
+                csv += '"' + a.attachments + '",';
+                csv += a.date + ',';
+                csv += '"' + a.notes + '"\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'استمارة_' + data.m + '_' + data.y + '.csv';
+            link.click();
+            showNotification('تم تصدير الملف إلى Excel', 'success');
+        }
+
+        async function loadReports(forceRefresh = false) {
+            const tbody = document.getElementById('reportsTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">جاري جلب البيانات من جوجل شيت...</td></tr>';
+            
+            const records = await fetchFromGoogleSheets(forceRefresh);
+            document.getElementById('totalRecords').textContent = records.length;
+            
+            // حساب الإحصائيات (نشطة، قارب الانتهاء، منتهية)
+            const nowTime = Date.now();
+            let active = 0, soon = 0, expired = 0;
+            records.forEach(r => {
+                const expiry = r.expiryDate || (r.timestamp + 31 * 24 * 60 * 60 * 1000);
+                if (nowTime > expiry) {
+                    expired++;
+                } else if (expiry - nowTime < 7 * 24 * 60 * 60 * 1000) {
+                    soon++;
+                } else {
+                    active++;
+                }
+            });
+            document.getElementById('activeRecords').textContent = active;
+            document.getElementById('expiringSoon').textContent = soon;
+            document.getElementById('expiredRecords').textContent = expired;
+
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">لا توجد سجلات</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            // ترتيب تنازلي حسب وقت الحفظ
+            const sortedRecords = records.slice().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            sortedRecords.forEach((r, i) => {
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + r.date + '</td>' +
+                    '<td><strong>' + r.employee + '</strong></td>' +
+                    '<td>' + r.workplace + '</td>' +
+                    '<td>' + r.month + ' ' + r.year + '</td>' +
+                    '<td>' + (r.activities ? r.activities.length : 0) + '</td>' +
+                    '<td><button class="btn-delete" onclick="deleteRecord(\'' + r.id + '\')" title="مسح السجل">🗑️ حذف</button></td>' +
+                '</tr>';
+            });
+        }
+
+        function deleteRecord(id) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            if (!confirm('حذف هذا السجل؟')) return;
+            
+            // حذف محلي أولاً
+            let records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem('sharedRecords', JSON.stringify(records));
+            
+            // حذف من جوجل شيت
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                showNotification('جاري حذف السجل من جوجل شيت...', 'info');
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'delete', id: id })
+                })
+                .then(() => {
+                    showNotification('تم الحذف من جوجل شيت بنجاح', 'success');
+                    loadReports(true); // جلب البيانات المحدثة
+                })
+                .catch(err => {
+                    console.error('Error deleting from Google Sheets:', err);
+                    showNotification('حدث خطأ أثناء الحذف من جوجل شيت', 'error');
+                    loadReports();
+                });
+            } else {
+                loadReports();
+            }
+        }
+
+        async function deleteActivityFromAllRecords(activityName) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            if (!confirm('هل أنت متأكد من حذف هذا النشاط ("' + activityName + '") من جميع السجلات؟ هذا الإجراء سيقوم بإزالة هذا النشاط وتحديث السجلات المرتبطة به.')) return;
+            
+            showNotification('جاري حذف النشاط...', 'info');
+            
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+            
+            let updatedRecords = [];
+            let changed = false;
+            const now = new Date();
+            let changedRecords = [];
+            
+            records.forEach(r => {
+                if (r.activities) {
+                    const originalLength = r.activities.length;
+                    r.activities = r.activities.filter(act => (act.name || '').trim() !== activityName.trim());
+                    if (r.activities.length !== originalLength) {
+                        changed = true;
+                        r.timestamp = now.getTime();
+                        r.lastUpdated = now.toLocaleString('ar-IQ');
+                        r.updatedBy = currentUser;
+                        changedRecords.push(r);
+                    }
+                }
+                updatedRecords.push(r);
+            });
+            
+            if (!changed) {
+                showNotification('لم يتم العثور على النشاط.', 'info');
+                return;
+            }
+            
+            localStorage.setItem('sharedRecords', JSON.stringify(updatedRecords));
+            
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                showNotification('جاري تحديث السجلات في جوجل شيت...', 'info');
+                let promises = changedRecords.map(r => {
+                    return fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify(r)
+                    });
+                });
+                
+                try {
+                    await Promise.all(promises);
+                    showNotification('تم حذف النشاط وتحديث السجلات بنجاح في جوجل شيت', 'success');
+                } catch (err) {
+                    console.error('Error syncing deletion with Google Sheets:', err);
+                    showNotification('حدث خطأ أثناء الاتصال بجوجل شيت، تم التحديث محلياً فقط', 'error');
+                }
+            } else {
+                showNotification('تم الحذف محلياً (رابط جوجل شيت غير مهيأ)', 'success');
+            }
+            
+            loadCumulativeReport(true);
+            loadReports(true);
+        }
+
+        async function loadCumulativeReport(forceRefresh = false) {
+            const tbody = document.getElementById('cumulativeTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">جاري جلب البيانات من جوجل شيت...</td></tr>';
+            
+            const records = await fetchFromGoogleSheets(forceRefresh);
+            const map = {};
+            let total = 0;
+            const employees = new Set();
+            records.forEach(r => {
+                if (r.employee) employees.add(r.employee);
+                if (r.activities) r.activities.forEach(a => {
+                    const k = (a.name || '').trim();
+                    if (!k) return;
+                    if (!map[k]) map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                    map[k].count++;
+                    map[k].participants += parseInt(a.participants) || 0;
+                    total += parseInt(a.participants) || 0;
+                    if (a.date) map[k].dates.push(a.date);
+                    if (a.notes) map[k].notes.push(a.notes);
+                });
+            });
+            const activities = Object.values(map).sort((a, b) => b.count - a.count);
+            document.getElementById('totalUniqueActivities').textContent = activities.length;
+            document.getElementById('totalActivitiesCount').textContent = activities.reduce((s, a) => s + a.count, 0);
+            document.getElementById('totalParticipants').textContent = total;
+            document.getElementById('totalEmployees').textContent = employees.size;
+            if (activities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">لا توجد بيانات</td></tr>';
+                return;
+            }
+            tbody.innerHTML = '';
+            activities.forEach((a, i) => {
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><strong style="color:#8e44ad;">' + a.name + '</strong></td>' +
+                    '<td><span class="activity-count">' + a.count + ' مرة</span></td>' +
+                    '<td><span class="participants-sum">' + a.participants + ' مشارك</span></td>' +
+                    '<td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td>' +
+                    '<td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                    '<td><button class="btn-delete" onclick="deleteActivityFromAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="مسح النشاط من جميع السجلات">🗑️ حذف</button></td>' +
+                '</tr>';
+            });
+        }
+
+        function getFilteredCumulativeData() {
+            const records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            const map = {};
+            let total = 0;
+            records.forEach(r => {
+                if (r.activities) r.activities.forEach(a => {
+                    const k = (a.name || '').trim();
+                    if (!k) return;
+                    if (!map[k]) map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                    map[k].count++;
+                    map[k].participants += parseInt(a.participants) || 0;
+                    total += parseInt(a.participants) || 0;
+                    if (a.date) map[k].dates.push(a.date);
+                    if (a.notes) map[k].notes.push(a.notes);
+                });
+            });
+            return { records, activities: Object.values(map).sort((a, b) => b.count - a.count), totalParticipants: total, employees: new Set(records.map(r => r.employee)) };
+        }
+
+        function buildPrintHTML(activities, totalParticipants, employees) {
+            let rows = '';
+            activities.forEach((a, i) => {
+                rows += '<tr><td>' + (i + 1) + '</td><td style="text-align:right;"><strong>' + a.name + '</strong></td><td>' + a.count + '</td><td>' + a.participants + '</td><td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td><td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td></tr>';
+            });
+            return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>التقرير</title><style>body { font-family: Arial, sans-serif; padding: 20px; direction: rtl; } .header { text-align: center; border-bottom: 3px solid #8e44ad; padding-bottom: 15px; margin-bottom: 20px; } .header h1 { color: #1e3c72; } .info-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; } table { width: 100%; border-collapse: collapse; } thead { background: #8e44ad; color: #fff; } th, td { padding: 10px; border: 1px solid #ddd; text-align: center; } @page { size: A4; margin: 1cm; }</style></head><body><div class="header"><h1>وزارة التربية - مديرية تربية المثنى</h1><h2>قسم الإعداد والتدريب - التقرير التراكمي</h2></div><div class="info-box"><strong>التاريخ:</strong> ' + new Date().toLocaleString('ar-IQ') + '<br><strong>إجمالي الأنشطة:</strong> ' + activities.length + ' | <strong>إجمالي المشاركين:</strong> ' + totalParticipants + ' | <strong>عدد الموظفين:</strong> ' + employees.size + '</div><table><thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th></tr></thead><tbody>' + rows + '</tbody></table></body></html>';
+        }
+
+        function exportCumulativePDF() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
+            const w = window.open('', '_blank');
+            w.document.write(buildPrintHTML(data.activities, data.totalParticipants, data.employees));
+            w.document.close();
+            setTimeout(() => w.print(), 500);
+        }
+
+        function printCumulativeReport() { exportCumulativePDF(); }
+        function exportPDF() { if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; } exportCumulativePDF(); }
+
+        function exportCumulativeExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
+            let csv = '\uFEFFالتقرير التراكمي\n\nت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
+            data.activities.forEach((a, i) => { csv += (i+1) + ',"' + a.name + '",' + a.count + ',' + a.participants + ',"' + [...new Set(a.dates)].join(' | ') + '","' + [...new Set(a.notes)].join(' | ') + '"\n'; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'التقرير_التراكمي_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+        }
+
+        function exportExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            if (!records.length) { showNotification('لا توجد بيانات!', 'error'); return; }
+            let csv = '\uFEFFالتاريخ,الموظف,مكان العمل,الشهر,السنة,النشاط,التفاصيل,المشتركين\n';
+            records.forEach(r => r.activities.forEach(a => csv += '"' + r.date + '","' + r.employee + '","' + r.workplace + '","' + r.month + '","' + r.year + '","' + a.name + '","' + a.details + '","' + a.participants + '"\n'));
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'تقرير_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.click();
+        }
+
+        function showNotification(msg, type) {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.className = 'notification ' + type;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 4000);
+        }
+
+        function exportFormJSON() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ البيانات المطلوبة أولاً!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+            
+            const record = {
+                id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                timestamp: Date.now(),
+                date: new Date().toLocaleString('ar-IQ'),
+                month: data.m,
+                year: data.y,
+                employee: data.e,
+                workplace: data.w,
+                activities: data.acts,
+                savedBy: currentUser || 'user'
+            };
+            
+            const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `استمارة_${record.employee}_${record.month}_${record.year}.json`;
+            link.click();
+            showNotification('تم تصدير ملف بيانات الاستمارة بنجاح', 'success');
+        }
+
+        function triggerImportJSON() {
+            document.getElementById('importJsonInput').click();
+        }
+
+        async function importFormJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const importedRecord = JSON.parse(e.target.result);
+                    if (!importedRecord.id || !importedRecord.employee || !importedRecord.activities) {
+                        throw new Error('ملف غير صالح');
+                    }
+                    
+                    // دمج السجل محلياً
+                    let localRecords = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+                    const existsIdx = localRecords.findIndex(r => r.id === importedRecord.id);
+                    if (existsIdx !== -1) {
+                        localRecords[existsIdx] = importedRecord;
+                    } else {
+                        localRecords.push(importedRecord);
+                    }
+                    localStorage.setItem('sharedRecords', JSON.stringify(localRecords));
+                    
+                    // مزامنة مع السيرفر المحلي أو جوجل شيت إذا كان متصلاً
+                    let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        sendToGoogleSheets(importedRecord);
+                    }
+                    
+                    showNotification('تم استيراد استمارة الموظف: ' + importedRecord.employee + ' بنجاح', 'success');
+                    loadReports(true);
+                    if (typeof loadCumulativeReport === 'function') {
+                        loadCumulativeReport(true);
+                    }
+                } catch (err) {
+                    console.error('Error importing JSON:', err);
+                    showNotification('خطأ: الملف المختار غير صالح أو تالف!', 'error');
+                }
+                event.target.value = ''; // إعادة تعيين
+            };
+            reader.readAsText(file);
+        }
+
+        window.addEventListener('load', function() {
+            // تنظيف الرابط القديم من localStorage لضمان تفعيل الرابط الجديد كافتراضي تلقائياً للمستخدم
+            const oldDefault = 'https://script.google.com/macros/s/AKfycbzlDjh4SVBEnaRA6_eWXhCyYwfzx4_SDcwpTnpsxnXveOo-E-AO4pocYvMDGsF5S-xo/exec';
+            if (localStorage.getItem('googleScriptUrl') === oldDefault) {
+                localStorage.removeItem('googleScriptUrl');
+            }
+
+            initializeDefaultUsers();
+            
+            // جلب ومزامنة الحسابات والسجلات في الخلفية فور فتح الصفحة
+            fetchFromGoogleSheets(true).then(() => {
+                // إذا تم تحديث الحسابات، أعد تحميل جدول المستخدمين في حال كان الأدمن فاتحاً للوحة التحكم
+                if (currentUserRole === 'admin' && document.getElementById('adminPage').classList.contains('active')) {
+                    loadUsers();
+                }
+            }).catch(e => console.error("Error loading initial data:", e));
+
+            const savedUser = localStorage.getItem('currentUser');
+            const savedRole = localStorage.getItem('currentUserRole');
+            if (savedUser && savedRole && getUsers()[savedUser]) {
+                currentUser = savedUser; currentUserRole = savedRole;
+                document.getElementById('userDisplay').textContent = savedUser;
+                if (currentUserRole === 'admin') {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="admin-badge">أدمن</span>';
+                    document.getElementById('navAdminBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="role-badge user">مستخدم</span>';
+                    document.getElementById('navAdminBtn').style.display = 'none';
+                }
+                document.getElementById('mainNavbar').classList.add('show');
+                showPage('formPage');
+                if (rowCount === 0) addRow();
+                loadReports();
+            }
+        });
+    </script>
+</body>
+</html>
