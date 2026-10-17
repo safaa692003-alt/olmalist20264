@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام إدارة استمارة النشاطات - مديرية تربية المثنى</title>
-    <link rel="icon" type="image/png" href="logo1_old.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', 'Tahoma', sans-serif; }
         body { background: #f0f2f5; min-height: 100vh; }
@@ -16,8 +15,7 @@
         .header-right h1 { font-size: 20px; color: #1e3c72; margin-bottom: 2px; font-weight: bold; }
         .header-right h2 { font-size: 14px; color: #2a5298; padding-top: 2px; border-top: 1px solid #ddd; display: inline-block; }
         .header-logo { text-align: center; padding: 0 10px; }
-        .header-logo img { width: 75px; height: 75px; object-fit: contain; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.15)); transition: transform 0.3s ease; }
-        .header-logo img:hover { transform: scale(1.05); }
+        .header-logo img { width: 70px; height: 70px; object-fit: contain; }
         .header-left { text-align: left; }
         .header-left h1 { font-size: 18px; color: #1e3c72; margin-bottom: 2px; font-weight: bold; }
         .header-left h2 { font-size: 13px; color: #2a5298; padding-top: 2px; border-top: 1px solid #ddd; display: inline-block; }
@@ -196,7 +194,7 @@
             </div>
             <div class="header-logo">
                 <div class="logo-ring"></div>
-                <img src="logo1_old.png" alt="شعار وزارة التربية" onerror="this.style.display='none'">
+                <img src="logo1.png" alt="شعار وزارة التربية" onerror="this.style.display='none'">
             </div>
             <div class="header-left">
                 <h1>قسم الاعداد والتدريب</h1>
@@ -224,7 +222,6 @@
             <div class="login-container">
                 <div class="login-box">
                     <div class="login-header">
-                        <img src="logo1.png" alt="شعار نظام النشاطات" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 12px; filter: drop-shadow(0 4px 12px rgba(30,60,114,0.2));">
                         <h1>نظام إدارة النشاطات</h1>
                         <p>الرجاء تسجيل الدخول للمتابعة</p>
                     </div>
@@ -251,7 +248,7 @@
                 <div class="form-row">
                     <div><label>الشهر <span class="required-star">*</span></label><select id="month"><option value="">-- اختر --</option><option value="يناير">يناير</option><option value="فبراير">فبراير</option><option value="مارس">مارس</option><option value="أبريل">أبريل</option><option value="مايو">مايو</option><option value="يونيو">يونيو</option><option value="يوليو">يوليو</option><option value="أغسطس">أغسطس</option><option value="سبتمبر">سبتمبر</option><option value="أكتوبر">أكتوبر</option><option value="نوفمبر">نوفمبر</option><option value="ديسمبر">ديسمبر</option></select></div>
                     <div><label>السنة <span class="required-star">*</span></label><select id="year"><option value="">-- اختر --</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select></div>
-                    <div><label>الموظف المسؤول <span class="required-star">*</span></label><select id="employee"><option value="">-- اختر --</option><option value="م.م صفاء هادي">م.م صفاء هادي</option><option value="حمزة جابر علوان">حمزة جابر علوان</option><option value="فاطمة علوان">فاطمة علوان</option><option value="حسين عباس">حسين عباس</option><option value="م.م طاهر طالب">م.م طاهر طالب</option><option value="م.م حسين فالح">م.م حسين فالح</option><option value="ستار عبد اكعيم">ستار عبد اكعيم</option><option value="ضرغام ماجد">ضرغام ماجد</option></select></div>
+                    <div><label>الموظف المسؤول <span class="required-star">*</span></label><select id="employee"><option value="">-- اختر --</option><option value="م.م صفاء هادي">م.م صفاء هادي</option><option value="حمزة جابر علوان">حمزة جابر علوان</option><option value="بنين عقيل">بنين عقيل</option><option value="حسين عباس">حسين عباس</option><option value="م.م علي صباح">م.م علي صباح</option><option value="م.م حسين فالح">م.م حسين فالح</option><option value="ستار عبد اكعيم">ستار عبد اكعيم</option><option value="ضرغام ماجد">ضرغام ماجد</option></select></div>
                     <div><label>مكان العمل <span class="required-star">*</span></label><select id="workplace"><option value="">-- اختر --</option><option value="مدير القسم">مدير القسم</option><option value="معاون مدير القسم">معاون مدير القسم</option><option value="مكتب رئيس القسم">مكتب رئيس القسم</option><option value="شعبة التدريب">شعبة التدريب</option><option value="شعبة المعاهد">شعبة المعاهد</option><option value="شعبة البحوث والدراسات">شعبة البحوث والدراسات</option><option value="شعبة الاشغال اليدوية">شعبة الاشغال اليدوية</option><option value="وحدة اللغة العربية">وحدة اللغة العربية</option></select></div>
                 </div>
                 <div class="table-section">
@@ -323,17 +320,62 @@
                     <div class="stat-card orange"><div class="stat-value" id="totalParticipants">0</div><div class="stat-label">المشاركين</div></div>
                     <div class="stat-card"><div class="stat-value" id="totalEmployees">0</div><div class="stat-label">الموظفين</div></div>
                 </div>
-                <div class="export-buttons">
-                    <button class="export-btn pdf" onclick="exportCumulativePDF()">PDF</button>
-                    <button class="export-btn excel" onclick="exportCumulativeExcel()">Excel</button>
-                    <button class="export-btn print" onclick="printCumulativeReport()">طباعة</button>
-                    <button class="export-btn refresh" onclick="loadCumulativeReport(true)" style="background:#9b59b6;">تحديث</button>
+                <div class="export-buttons" style="justify-content: space-between; align-items: center;">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="export-btn pdf" onclick="exportCumulativePDF()">PDF</button>
+                        <button class="export-btn excel" onclick="exportCumulativeExcel()">Excel</button>
+                        <button class="export-btn print" onclick="printCumulativeReport()">طباعة</button>
+                        <button class="export-btn refresh" onclick="loadCumulativeReport(true)" style="background:#9b59b6;">تحديث</button>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                        <select id="cumFilterWorkplace" onchange="renderCumulativeTables()" style="padding:7px 12px; border:2px solid #8e44ad; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                            <option value="">جميع الشعب / أماكن العمل</option>
+                            <option value="مدير القسم">مدير القسم</option>
+                            <option value="معاون مدير القسم">معاون مدير القسم</option>
+                            <option value="مكتب رئيس القسم">مكتب رئيس القسم</option>
+                            <option value="شعبة التدريب">شعبة التدريب</option>
+                            <option value="شعبة المعاهد">شعبة المعاهد</option>
+                            <option value="شعبة البحوث والدراسات">شعبة البحوث والدراسات</option>
+                            <option value="شعبة الاشغال اليدوية">شعبة الاشغال اليدوية</option>
+                            <option value="وحدة اللغة العربية">وحدة اللغة العربية</option>
+                        </select>
+                        <select id="cumFilterMonth" onchange="renderCumulativeTables()" style="padding:7px 12px; border:2px solid #8e44ad; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                            <option value="">جميع الأشهر</option>
+                            <option value="يناير">يناير</option>
+                            <option value="فبراير">فبراير</option>
+                            <option value="مارس">مارس</option>
+                            <option value="أبريل">أبريل</option>
+                            <option value="مايو">مايو</option>
+                            <option value="يونيو">يونيو</option>
+                            <option value="يوليو">يوليو</option>
+                            <option value="أغسطس">أغسطس</option>
+                            <option value="سبتمبر">سبتمبر</option>
+                            <option value="أكتوبر">أكتوبر</option>
+                            <option value="نوفمبر">نوفمبر</option>
+                            <option value="ديسمبر">ديسمبر</option>
+                        </select>
+                        <select id="cumFilterYear" onchange="renderCumulativeTables()" style="padding:7px 12px; border:2px solid #8e44ad; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                            <option value="">جميع السنوات</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="reports-table-wrapper">
                     <table class="reports-table cumulative-table">
                         <thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th><th>الإجراءات</th></tr></thead>
                         <tbody id="cumulativeTableBody"></tbody>
                     </table>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="form-section-title" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); margin-bottom: 12px;">
+                        <h2>جدول نشاطات الشعب التفصيلي (حسب الأشهر والشعب كما أرسلها المستخدمون)</h2>
+                    </div>
+                    <div id="detailedWorkplaceTablesContainer"></div>
                 </div>
             </div>
         </div>
@@ -403,8 +445,8 @@
                 'admin': { password: 'SA@@2026##ra', role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' },
                 'user': { password: 'user@159', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
                 'hossin.f': { password: 'hos@789', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
-                'taher.t': { password: 'taher@123', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
-                'fatima.a': { password: 'fatima#753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'ali.sabah': { password: 'bohuth123', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'baneen': { password: 'baneen#753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
                 'hamza.j': { password: 'hamza@159', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
                 'staar.a': { password: 'sataar753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
                 'drgham': { password: 'drgham@@753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' }
@@ -753,7 +795,7 @@
         }
 
         // ضع رابط Google Apps Script الخاص بك هنا بين علامتي الاقتباس ليكون افتراضياً للجميع
-        const DEFAULT_GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwn_8S98Tqpud0xSANRP9vVpy0oL7YGZPwFEY45fjfrGyhwJAOhiUL8znA5eJf0mtXV/exec';
+        const DEFAULT_GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtoXgqEXS3aKJDryV_rn7NV7Meraa0lhTKHHts5GLHh7aUYulR9pAbxWhESe1zTSjk/exec';
 
         // إرسال البيانات إلى Google Sheets عبر Apps Script Web App
         function sendToGoogleSheets(recordData) {
@@ -1283,11 +1325,32 @@
             loadReports(true);
         }
 
+        let cachedCumulativeRecords = [];
+
         async function loadCumulativeReport(forceRefresh = false) {
             const tbody = document.getElementById('cumulativeTableBody');
+            const detailedContainer = document.getElementById('detailedWorkplaceTablesContainer');
             if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">جاري جلب البيانات من جوجل شيت...</td></tr>';
+            if (detailedContainer) detailedContainer.innerHTML = '<div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px;">جاري جلب وتجميع نشاطات الشعب والأشهر...</div>';
             
-            const records = await fetchFromGoogleSheets(forceRefresh);
+            cachedCumulativeRecords = await fetchFromGoogleSheets(forceRefresh);
+            renderCumulativeTables();
+        }
+
+        function renderCumulativeTables() {
+            const tbody = document.getElementById('cumulativeTableBody');
+            const detailedContainer = document.getElementById('detailedWorkplaceTablesContainer');
+            const filterWorkplace = document.getElementById('cumFilterWorkplace') ? document.getElementById('cumFilterWorkplace').value : '';
+            const filterMonth = document.getElementById('cumFilterMonth') ? document.getElementById('cumFilterMonth').value : '';
+            const filterYear = document.getElementById('cumFilterYear') ? document.getElementById('cumFilterYear').value : '';
+
+            const records = (cachedCumulativeRecords && cachedCumulativeRecords.length ? cachedCumulativeRecords : JSON.parse(localStorage.getItem('sharedRecords') || '[]')).filter(r => {
+                if (filterWorkplace && r.workplace !== filterWorkplace) return false;
+                if (filterMonth && r.month !== filterMonth) return false;
+                if (filterYear && r.year !== filterYear) return false;
+                return true;
+            });
+
             const map = {};
             let total = 0;
             const employees = new Set();
@@ -1309,26 +1372,192 @@
             document.getElementById('totalActivitiesCount').textContent = activities.reduce((s, a) => s + a.count, 0);
             document.getElementById('totalParticipants').textContent = total;
             document.getElementById('totalEmployees').textContent = employees.size;
+
             if (activities.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">لا توجد بيانات</td></tr>';
+                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">لا توجد بيانات مطابقة للفلتر المحدد</td></tr>';
+                if (detailedContainer) detailedContainer.innerHTML = '<div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px; color:#777;">لا توجد نشاطات مرسلة مطابقة للفلتر المحدد</div>';
                 return;
             }
-            tbody.innerHTML = '';
-            activities.forEach((a, i) => {
-                tbody.innerHTML += '<tr>' +
-                    '<td>' + (i + 1) + '</td>' +
-                    '<td><strong style="color:#8e44ad;">' + a.name + '</strong></td>' +
-                    '<td><span class="activity-count">' + a.count + ' مرة</span></td>' +
-                    '<td><span class="participants-sum">' + a.participants + ' مشارك</span></td>' +
-                    '<td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td>' +
-                    '<td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
-                    '<td><button class="btn-delete" onclick="deleteActivityFromAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="مسح النشاط من جميع السجلات">🗑️ حذف</button></td>' +
-                '</tr>';
-            });
+
+            if (tbody) {
+                tbody.innerHTML = '';
+                activities.forEach((a, i) => {
+                    tbody.innerHTML += '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td><strong style="color:#8e44ad;">' + a.name + '</strong></td>' +
+                        '<td><span class="activity-count">' + a.count + ' مرة</span></td>' +
+                        '<td><span class="participants-sum">' + a.participants + ' مشارك</span></td>' +
+                        '<td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td>' +
+                        '<td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                        '<td><button class="btn-delete" onclick="deleteActivityFromAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="مسح النشاط من جميع السجلات">🗑️ حذف</button></td>' +
+                    '</tr>';
+                });
+            }
+
+            // بناء الجداول المقسمة حسب الشعب وحسب الأشهر بمعلومات كاملة وواضحة كما يرسلها المستخدمون
+            if (detailedContainer) {
+                const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+                const groupedByWorkplace = {};
+
+                records.forEach(r => {
+                    const wp = r.workplace || 'غير محدد';
+                    const monthYear = (r.month || 'غير محدد') + ' ' + (r.year || '');
+                    if (!groupedByWorkplace[wp]) groupedByWorkplace[wp] = {};
+                    if (!groupedByWorkplace[wp][monthYear]) {
+                        groupedByWorkplace[wp][monthYear] = {
+                            month: r.month || '',
+                            year: r.year || '',
+                            items: []
+                        };
+                    }
+                    if (r.activities && r.activities.length) {
+                        r.activities.forEach((act, actIndex) => {
+                            if (!act.name || !act.name.trim()) return;
+                            groupedByWorkplace[wp][monthYear].items.push({
+                                recordId: r.id,
+                                actIndex: actIndex,
+                                employee: r.employee || '-',
+                                workplace: wp,
+                                month: r.month || '-',
+                                year: r.year || '-',
+                                name: act.name || '-',
+                                details: act.details || '-',
+                                participants: parseInt(act.participants) || 0,
+                                executor: act.executor || '-',
+                                target: act.target || '-',
+                                attachments: act.attachments || '-',
+                                date: act.date || '-',
+                                notes: act.notes || '-'
+                            });
+                        });
+                    }
+                });
+
+                let html = '';
+                const workplaces = Object.keys(groupedByWorkplace);
+                workplaces.forEach(wp => {
+                    const monthGroups = Object.values(groupedByWorkplace[wp]).filter(mg => mg.items.length > 0);
+                    if (monthGroups.length === 0) return;
+
+                    // ترتيب الأشهر زمنياً
+                    monthGroups.sort((a, b) => {
+                        if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                        return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+                    });
+
+                    const wpTotalActs = monthGroups.reduce((s, mg) => s + mg.items.length, 0);
+                    const wpTotalParts = monthGroups.reduce((s, mg) => s + mg.items.reduce((ps, it) => ps + it.participants, 0), 0);
+
+                    html += '<div style="margin-bottom: 25px; border: 2px solid #1e3c72; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
+                    html += '<div style="background: #1e3c72; color: #fff; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">';
+                    html += '<div style="font-size: 16px; font-weight: bold;">🏢 الشعبة / مكان العمل: <span style="color: gold;">' + wp + '</span></div>';
+                    html += '<div style="display: flex; gap: 12px; font-size: 13px;">' +
+                                '<span style="background: rgba(255,255,255,0.18); padding: 4px 10px; border-radius: 6px;">إجمالي النشاطات: <strong>' + wpTotalActs + '</strong></span>' +
+                                '<span style="background: rgba(39,174,96,0.85); padding: 4px 10px; border-radius: 6px;">إجمالي المشتركين: <strong>' + wpTotalParts + '</strong></span>' +
+                            '</div>';
+                    html += '</div>';
+
+                    monthGroups.forEach(mg => {
+                        const monthParts = mg.items.reduce((ps, it) => ps + it.participants, 0);
+                        html += '<div style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">';
+                        html += '<div style="background: linear-gradient(135deg, #f4ecf7 0%, #e8d5f0 100%); color: #6c3483; padding: 8px 14px; border-radius: 6px; margin-bottom: 10px; border-right: 4px solid #8e44ad; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;">';
+                        html += '<strong style="font-size: 14px;">📅 شهر: ' + mg.month + ' ' + mg.year + '</strong>';
+                        html += '<span style="font-size: 12px; font-weight: bold;">عدد النشاطات: ' + mg.items.length + ' | المشتركين: ' + monthParts + ' مشارك</span>';
+                        html += '</div>';
+
+                        html += '<div class="reports-table-wrapper">';
+                        html += '<table class="reports-table" style="min-width: 1000px; margin-bottom: 5px;">';
+                        html += '<thead style="background: #2c3e50;"><tr>' +
+                                    '<th style="width:35px;">ت</th>' +
+                                    '<th>الموظف المرسل</th>' +
+                                    '<th>الشهر / السنة</th>' +
+                                    '<th>اسم النشاط</th>' +
+                                    '<th>التفاصيل</th>' +
+                                    '<th>المشتركين</th>' +
+                                    '<th>جهة التنفيذ</th>' +
+                                    '<th>الجهة المستهدفة</th>' +
+                                    '<th>المرفقات</th>' +
+                                    '<th>التاريخ</th>' +
+                                    '<th>الملاحظات</th>' +
+                                    '<th>إجراء</th>' +
+                                '</tr></thead><tbody>';
+
+                        mg.items.forEach((item, idx) => {
+                            html += '<tr>' +
+                                '<td>' + (idx + 1) + '</td>' +
+                                '<td><strong>' + item.employee + '</strong></td>' +
+                                '<td><span style="background:#eef2f7; color:#1e3c72; padding:3px 8px; border-radius:6px; font-weight:bold; font-size:11px;">' + item.month + ' ' + item.year + '</span></td>' +
+                                '<td><strong style="color:#8e44ad;">' + item.name + '</strong></td>' +
+                                '<td style="max-width:220px; white-space:pre-wrap; text-align:right;">' + (item.details || '-') + '</td>' +
+                                '<td><span class="participants-sum">' + item.participants + ' مشارك</span></td>' +
+                                '<td>' + (item.executor || '-') + '</td>' +
+                                '<td>' + (item.target || '-') + '</td>' +
+                                '<td>' + (item.attachments || '-') + '</td>' +
+                                '<td style="direction:ltr;">' + (item.date || '-') + '</td>' +
+                                '<td style="max-width:160px; white-space:pre-wrap;">' + (item.notes || '-') + '</td>' +
+                                '<td><button class="btn-delete" onclick="deleteSingleActivityFromRecord(\'' + item.recordId + '\', ' + item.actIndex + ')" title="حذف هذا النشاط">🗑️ حذف</button></td>' +
+                            '</tr>';
+                        });
+
+                        html += '</tbody></table></div></div>';
+                    });
+
+                    html += '</div>';
+                });
+
+                detailedContainer.innerHTML = html || '<div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px; color:#777;">لا توجد نشاطات مفصلة لعرضها</div>';
+            }
+        }
+
+        async function deleteSingleActivityFromRecord(recordId, actIndex) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            if (!confirm('هل أنت متأكد من حذف هذا النشاط من سجل الشعبة؟')) return;
+
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const rIdx = records.findIndex(r => r.id.toString() === recordId.toString());
+            if (rIdx === -1 || !records[rIdx].activities) {
+                showNotification('لم يتم العثور على السجل!', 'error');
+                return;
+            }
+
+            records[rIdx].activities.splice(actIndex, 1);
+            const now = new Date();
+            records[rIdx].timestamp = now.getTime();
+            records[rIdx].lastUpdated = now.toLocaleString('ar-IQ');
+            records[rIdx].updatedBy = currentUser;
+
+            localStorage.setItem('sharedRecords', JSON.stringify(records));
+            cachedCumulativeRecords = records;
+
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                sendToGoogleSheets(records[rIdx]);
+            }
+
+            renderCumulativeTables();
+            loadReports(true);
+            showNotification('تم حذف النشاط بنجاح', 'success');
         }
 
         function getFilteredCumulativeData() {
-            const records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            const filterWorkplace = document.getElementById('cumFilterWorkplace') ? document.getElementById('cumFilterWorkplace').value : '';
+            const filterMonth = document.getElementById('cumFilterMonth') ? document.getElementById('cumFilterMonth').value : '';
+            const filterYear = document.getElementById('cumFilterYear') ? document.getElementById('cumFilterYear').value : '';
+
+            const allRecords = cachedCumulativeRecords && cachedCumulativeRecords.length ? cachedCumulativeRecords : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            const records = allRecords.filter(r => {
+                if (filterWorkplace && r.workplace !== filterWorkplace) return false;
+                if (filterMonth && r.month !== filterMonth) return false;
+                if (filterYear && r.year !== filterYear) return false;
+                return true;
+            });
+
             const map = {};
             let total = 0;
             records.forEach(r => {
@@ -1346,12 +1575,63 @@
             return { records, activities: Object.values(map).sort((a, b) => b.count - a.count), totalParticipants: total, employees: new Set(records.map(r => r.employee)) };
         }
 
-        function buildPrintHTML(activities, totalParticipants, employees) {
+        function buildPrintHTML(activities, totalParticipants, employees, records = []) {
             let rows = '';
             activities.forEach((a, i) => {
                 rows += '<tr><td>' + (i + 1) + '</td><td style="text-align:right;"><strong>' + a.name + '</strong></td><td>' + a.count + '</td><td>' + a.participants + '</td><td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td><td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td></tr>';
             });
-            return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>التقرير</title><style>body { font-family: Arial, sans-serif; padding: 20px; direction: rtl; } .header { text-align: center; border-bottom: 3px solid #8e44ad; padding-bottom: 15px; margin-bottom: 20px; } .header h1 { color: #1e3c72; } .info-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; } table { width: 100%; border-collapse: collapse; } thead { background: #8e44ad; color: #fff; } th, td { padding: 10px; border: 1px solid #ddd; text-align: center; } @page { size: A4; margin: 1cm; }</style></head><body><div class="header"><h1>وزارة التربية - مديرية تربية المثنى</h1><h2>قسم الإعداد والتدريب - التقرير التراكمي</h2></div><div class="info-box"><strong>التاريخ:</strong> ' + new Date().toLocaleString('ar-IQ') + '<br><strong>إجمالي الأنشطة:</strong> ' + activities.length + ' | <strong>إجمالي المشاركين:</strong> ' + totalParticipants + ' | <strong>عدد الموظفين:</strong> ' + employees.size + '</div><table><thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th></tr></thead><tbody>' + rows + '</tbody></table></body></html>';
+
+            // بناء الجداول التفصيلية حسب الشعب والأشهر للطباعة
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            const groupedByWorkplace = {};
+            records.forEach(r => {
+                const wp = r.workplace || 'غير محدد';
+                const monthYear = (r.month || 'غير محدد') + ' ' + (r.year || '');
+                if (!groupedByWorkplace[wp]) groupedByWorkplace[wp] = {};
+                if (!groupedByWorkplace[wp][monthYear]) {
+                    groupedByWorkplace[wp][monthYear] = { month: r.month || '', year: r.year || '', items: [] };
+                }
+                if (r.activities) {
+                    r.activities.forEach(act => {
+                        if (!act.name || !act.name.trim()) return;
+                        groupedByWorkplace[wp][monthYear].items.push({
+                            employee: r.employee || '-',
+                            month: r.month || '-',
+                            year: r.year || '-',
+                            name: act.name || '-',
+                            details: act.details || '-',
+                            participants: parseInt(act.participants) || 0,
+                            executor: act.executor || '-',
+                            target: act.target || '-',
+                            attachments: act.attachments || '-',
+                            date: act.date || '-',
+                            notes: act.notes || '-'
+                        });
+                    });
+                }
+            });
+
+            let detailedHtml = '<h2 style="color:#1e3c72; margin-top:30px; border-bottom:2px solid #1e3c72; padding-bottom:8px;">تفاصيل نشاطات الشعب حسب الأشهر</h2>';
+            Object.keys(groupedByWorkplace).forEach(wp => {
+                const monthGroups = Object.values(groupedByWorkplace[wp]).filter(mg => mg.items.length > 0);
+                if (!monthGroups.length) return;
+                monthGroups.sort((a, b) => {
+                    if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                    return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+                });
+                detailedHtml += '<div style="margin-top:18px; page-break-inside:avoid;"><h3 style="background:#1e3c72; color:#fff; padding:8px 12px; margin:0;">الشعبة / مكان العمل: ' + wp + '</h3>';
+                monthGroups.forEach(mg => {
+                    detailedHtml += '<div style="background:#f4ecf7; color:#6c3483; padding:6px 10px; font-weight:bold; border:1px solid #ddd;">شهر: ' + mg.month + ' ' + mg.year + ' (عدد النشاطات: ' + mg.items.length + ')</div>';
+                    detailedHtml += '<table style="margin-bottom:12px;"><thead><tr style="background:#2c3e50; color:#fff;"><th>ت</th><th>الموظف</th><th>الشهر</th><th>النشاط</th><th>التفاصيل</th><th>المشتركين</th><th>جهة التنفيذ</th><th>الجهة المستهدفة</th><th>المرفقات</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+                    mg.items.forEach((it, idx) => {
+                        detailedHtml += '<tr><td>' + (idx + 1) + '</td><td>' + it.employee + '</td><td>' + it.month + ' ' + it.year + '</td><td><strong>' + it.name + '</strong></td><td>' + it.details + '</td><td>' + it.participants + '</td><td>' + it.executor + '</td><td>' + it.target + '</td><td>' + it.attachments + '</td><td>' + it.date + '</td><td>' + it.notes + '</td></tr>';
+                    });
+                    detailedHtml += '</tbody></table>';
+                });
+                detailedHtml += '</div>';
+            });
+
+            return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>التقرير التراكمي</title><style>body { font-family: Arial, sans-serif; padding: 20px; direction: rtl; font-size: 11px; } .header { text-align: center; border-bottom: 3px solid #8e44ad; padding-bottom: 15px; margin-bottom: 20px; } .header h1 { color: #1e3c72; } .info-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; } table { width: 100%; border-collapse: collapse; } thead { background: #8e44ad; color: #fff; } th, td { padding: 6px; border: 1px solid #ddd; text-align: center; } @page { size: A4 landscape; margin: 1cm; }</style></head><body><div class="header"><h1>وزارة التربية - مديرية تربية المثنى</h1><h2>قسم الإعداد والتدريب - التقرير التراكمي ونشاطات الشعب</h2></div><div class="info-box"><strong>التاريخ:</strong> ' + new Date().toLocaleString('ar-IQ') + '<br><strong>إجمالي الأنشطة الفريدة:</strong> ' + activities.length + ' | <strong>إجمالي المشاركين:</strong> ' + totalParticipants + ' | <strong>عدد الموظفين:</strong> ' + employees.size + '</div><table><thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th></tr></thead><tbody>' + rows + '</tbody></table>' + detailedHtml + '</body></html>';
         }
 
         function exportCumulativePDF() {
@@ -1359,7 +1639,7 @@
             const data = getFilteredCumulativeData();
             if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
             const w = window.open('', '_blank');
-            w.document.write(buildPrintHTML(data.activities, data.totalParticipants, data.employees));
+            w.document.write(buildPrintHTML(data.activities, data.totalParticipants, data.employees, data.records));
             w.document.close();
             setTimeout(() => w.print(), 500);
         }
@@ -1371,12 +1651,24 @@
             if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
             const data = getFilteredCumulativeData();
             if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
-            let csv = '\uFEFFالتقرير التراكمي\n\nت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
+            let csv = '\uFEFFالتقرير التراكمي الإحصائي\n\nت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
             data.activities.forEach((a, i) => { csv += (i+1) + ',"' + a.name + '",' + a.count + ',' + a.participants + ',"' + [...new Set(a.dates)].join(' | ') + '","' + [...new Set(a.notes)].join(' | ') + '"\n'; });
+            
+            csv += '\n\nجدول نشاطات الشعب التفصيلي حسب الأشهر\n';
+            csv += 'الشعبة / مكان العمل,الشهر,السنة,الموظف المرسل,اسم النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+            data.records.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        if (!a.name || !a.name.trim()) return;
+                        csv += '"' + (r.workplace || '') + '","' + (r.month || '') + '","' + (r.year || '') + '","' + (r.employee || '') + '","' + (a.name || '') + '","' + (a.details || '') + '",' + (parseInt(a.participants) || 0) + ',"' + (a.executor || '') + '","' + (a.target || '') + '","' + (a.attachments || '') + '","' + (a.date || '') + '","' + (a.notes || '') + '"\n';
+                    });
+                }
+            });
+
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = 'التقرير_التراكمي_' + new Date().toISOString().split('T')[0] + '.csv';
+            link.download = 'التقرير_التراكمي_ونشاطات_الشعب_' + new Date().toISOString().split('T')[0] + '.csv';
             link.click();
         }
 
