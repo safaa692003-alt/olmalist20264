@@ -122,6 +122,96 @@
         .notification.error { background: #e74c3c; }
         .notification.info { background: #3498db; }
 
+        /* نافذة منبثقة لتعديل بيانات النشاط */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 15px;
+            backdrop-filter: blur(2px);
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 820px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 2px solid #1e3c72;
+            animation: modalFadeIn 0.2s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-body .form-row label {
+            color: #1e3c72;
+            font-weight: bold;
+        }
+        .modal-footer {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
         .app-footer { background: #1e3c72; color: #fff; padding: 20px; text-align: center; margin-top: 30px; border-top: 3px solid gold; }
         .app-footer .footer-content { max-width: 1500px; margin: 0 auto; }
         .app-footer .footer-title { font-size: 16px; margin-bottom: 6px; }
@@ -143,7 +233,7 @@
             @page { size: A4; margin: 1cm 1cm 1cm 1cm; }
             body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
 
-            #mainNavbar, #userNotice, .add-row-btn, .action-buttons, .export-buttons, .app-footer, .delete-btn, .btn-delete, .header-top, .form-section-title, .logo-ring { display: none !important; }
+            #mainNavbar, #userNotice, .add-row-btn, .action-buttons, .export-buttons, .app-footer, .delete-btn, .btn-delete, .btn-edit, .modal-overlay, .header-top, .form-section-title, .logo-ring { display: none !important; }
 
             .main-content { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
             .form-container, .reports-container, .cumulative-container, .admin-container { box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; background: #fff !important; }
@@ -443,6 +533,111 @@
     </div>
 
     <div class="notification" id="notification"></div>
+
+    <!-- نافذة منبثقة لتعديل بيانات النشاط -->
+    <div id="editActivityModal" class="modal-overlay" onclick="handleModalOverlayClick(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><span>✏️</span> تعديل معلومات النشاط المدخل</h3>
+                <button type="button" class="modal-close-btn" onclick="closeEditActivityModal()" title="إغلاق">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRecordId">
+                <input type="hidden" id="editActIndex">
+                
+                <div style="background: #f8f9fa; border-right: 4px solid #1e3c72; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong style="color: #1e3c72; font-size: 13px;">🏢 بيانات الاستمارة والسجل</strong>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px;">
+                    <div>
+                        <label>الموظف المسؤول <span class="required-star">*</span></label>
+                        <select id="editRecEmployee"></select>
+                    </div>
+                    <div>
+                        <label>مكان العمل / الشعبة <span class="required-star">*</span></label>
+                        <select id="editRecWorkplace"></select>
+                    </div>
+                    <div>
+                        <label>الشهر <span class="required-star">*</span></label>
+                        <select id="editRecMonth">
+                            <option value="يناير">يناير</option>
+                            <option value="فبراير">فبراير</option>
+                            <option value="مارس">مارس</option>
+                            <option value="أبريل">أبريل</option>
+                            <option value="مايو">مايو</option>
+                            <option value="يونيو">يونيو</option>
+                            <option value="يوليو">يوليو</option>
+                            <option value="أغسطس">أغسطس</option>
+                            <option value="سبتمبر">سبتمبر</option>
+                            <option value="أكتوبر">أكتوبر</option>
+                            <option value="نوفمبر">نوفمبر</option>
+                            <option value="ديسمبر">ديسمبر</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>السنة <span class="required-star">*</span></label>
+                        <select id="editRecYear">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; border-right: 4px solid #8e44ad; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong style="color: #8e44ad; font-size: 13px;">📝 تفاصيل النشاط المدخل</strong>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px;">
+                    <div style="grid-column: span 2;">
+                        <label>اسم النشاط <span class="required-star">*</span></label>
+                        <input type="text" id="editActName" placeholder="اسم النشاط">
+                    </div>
+                    <div>
+                        <label>عدد المشتركين</label>
+                        <input type="number" id="editActParticipants" min="0" placeholder="0">
+                    </div>
+                    <div>
+                        <label>تاريخ النشاط</label>
+                        <input type="date" id="editActDate">
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px;">
+                    <div>
+                        <label>جهة التنفيذ</label>
+                        <input type="text" id="editActExecutor" placeholder="جهة التنفيذ">
+                    </div>
+                    <div>
+                        <label>الجهة المستهدفة</label>
+                        <input type="text" id="editActTarget" placeholder="الجهة المستهدفة">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label>المرفقات</label>
+                        <input type="text" id="editActAttachments" placeholder="المرفقات">
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px; grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <label>تفاصيل النشاط</label>
+                        <textarea id="editActDetails" rows="3" style="width:100%; padding:10px; border:2px solid #1e3c72; border-radius:8px; font-size:13px; resize:vertical;" placeholder="تفاصيل النشاط..."></textarea>
+                    </div>
+                    <div>
+                        <label>الملاحظات</label>
+                        <textarea id="editActNotes" rows="3" style="width:100%; padding:10px; border:2px solid #1e3c72; border-radius:8px; font-size:13px; resize:vertical;" placeholder="الملاحظات..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeEditActivityModal()" style="padding: 9px 20px; background: #95a5a6; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">إلغاء</button>
+                <button type="button" id="saveEditActBtn" onclick="saveEditedActivity()" style="padding: 9px 22px; background: #27ae60; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px;">💾 حفظ التعديلات</button>
+            </div>
+        </div>
+    </div>
 
     <footer class="app-footer">
         <div class="footer-content">
@@ -1494,7 +1689,10 @@
                         '<td><span class="participants-sum">' + a.participants + ' مشارك</span></td>' +
                         '<td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td>' +
                         '<td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
-                        '<td><button class="btn-delete" onclick="deleteActivityFromAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="مسح النشاط من جميع السجلات">🗑️ حذف</button></td>' +
+                        '<td style="white-space:nowrap;">' +
+                            '<button class="btn-edit" onclick="editActivityNameInAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="تعديل اسم النشاط في جميع السجلات" style="background:#f39c12; margin-left:4px; font-weight:bold; padding:4px 8px; font-size:11px;">✏️ تعديل</button>' +
+                            '<button class="btn-delete" onclick="deleteActivityFromAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="مسح النشاط من جميع السجلات" style="font-weight:bold; padding:4px 8px; font-size:11px;">🗑️ حذف</button>' +
+                        '</td>' +
                     '</tr>';
                 });
             }
@@ -1607,7 +1805,10 @@
                                 '<td>' + (item.attachments || '-') + '</td>' +
                                 '<td style="direction:ltr;">' + (item.date || '-') + '</td>' +
                                 '<td style="max-width:160px; white-space:pre-wrap;">' + (item.notes || '-') + '</td>' +
-                                '<td><button class="btn-delete" onclick="deleteSingleActivityFromRecord(\'' + item.recordId + '\', ' + item.actIndex + ')" title="حذف هذا النشاط">🗑️ حذف</button></td>' +
+                                '<td style="white-space:nowrap;">' +
+                                    '<button class="btn-edit" onclick="openEditActivityModal(\'' + item.recordId + '\', ' + item.actIndex + ')" title="تعديل هذا النشاط" style="background:#f39c12; margin-left:4px; font-weight:bold; padding:4px 8px; font-size:11px;">✏️ تعديل</button>' +
+                                    '<button class="btn-delete" onclick="deleteSingleActivityFromRecord(\'' + item.recordId + '\', ' + item.actIndex + ')" title="حذف هذا النشاط" style="font-weight:bold; padding:4px 8px; font-size:11px;">🗑️ حذف</button>' +
+                                '</td>' +
                             '</tr>';
                         });
 
@@ -1844,6 +2045,316 @@
             loadReports(true);
             showNotification('تم حذف النشاط بنجاح', 'success');
         }
+
+        function populateEditModalDropdowns() {
+            const empSelect = document.getElementById('editRecEmployee');
+            const origEmpSelect = document.getElementById('employee');
+            if (empSelect && origEmpSelect) {
+                empSelect.innerHTML = origEmpSelect.innerHTML;
+            }
+            const wpSelect = document.getElementById('editRecWorkplace');
+            const origWpSelect = document.getElementById('workplace');
+            if (wpSelect && origWpSelect) {
+                wpSelect.innerHTML = origWpSelect.innerHTML;
+            }
+        }
+
+        function openEditActivityModal(recordId, actIndex) {
+            if (currentUserRole !== 'admin') {
+                showNotification('غير مصرح! صلاحية الأدمن مطلوبة للتعديل', 'error');
+                return;
+            }
+
+            const allRecords = (cachedCumulativeRecords && cachedCumulativeRecords.length) 
+                ? cachedCumulativeRecords 
+                : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+
+            const record = allRecords.find(r => r.id && r.id.toString() === recordId.toString());
+            if (!record || !record.activities || !record.activities[actIndex]) {
+                showNotification('لم يتم العثور على النشاط المحدد!', 'error');
+                return;
+            }
+
+            const act = record.activities[actIndex];
+
+            document.getElementById('editRecordId').value = recordId;
+            document.getElementById('editActIndex').value = actIndex;
+
+            populateEditModalDropdowns();
+
+            const empSelect = document.getElementById('editRecEmployee');
+            if (empSelect && record.employee) {
+                if (!Array.from(empSelect.options).some(o => o.value === record.employee)) {
+                    const opt = document.createElement('option');
+                    opt.value = record.employee;
+                    opt.textContent = record.employee;
+                    empSelect.appendChild(opt);
+                }
+                empSelect.value = record.employee;
+            }
+
+            const wpSelect = document.getElementById('editRecWorkplace');
+            if (wpSelect && record.workplace) {
+                if (!Array.from(wpSelect.options).some(o => o.value === record.workplace)) {
+                    const opt = document.createElement('option');
+                    opt.value = record.workplace;
+                    opt.textContent = record.workplace;
+                    wpSelect.appendChild(opt);
+                }
+                wpSelect.value = record.workplace;
+            }
+
+            document.getElementById('editRecMonth').value = record.month || '';
+            document.getElementById('editRecYear').value = record.year || '';
+
+            document.getElementById('editActName').value = act.name || '';
+            document.getElementById('editActDetails').value = act.details || '';
+            document.getElementById('editActParticipants').value = (act.participants !== undefined && act.participants !== null) ? act.participants : 0;
+            document.getElementById('editActExecutor').value = act.executor || '';
+            document.getElementById('editActTarget').value = act.target || '';
+            document.getElementById('editActAttachments').value = act.attachments || '';
+            document.getElementById('editActDate').value = act.date || '';
+            document.getElementById('editActNotes').value = act.notes || '';
+
+            const modal = document.getElementById('editActivityModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeEditActivityModal() {
+            const modal = document.getElementById('editActivityModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function handleModalOverlayClick(e) {
+            if (e.target.id === 'editActivityModal') {
+                closeEditActivityModal();
+            }
+        }
+
+        async function saveEditedActivity() {
+            if (currentUserRole !== 'admin') {
+                showNotification('غير مصرح!', 'error');
+                return;
+            }
+
+            const recordId = document.getElementById('editRecordId').value;
+            const actIndex = parseInt(document.getElementById('editActIndex').value);
+
+            const newName = document.getElementById('editActName').value.trim();
+            if (!newName) {
+                showNotification('يرجى إدخال اسم النشاط!', 'error');
+                return;
+            }
+
+            const newMonth = document.getElementById('editRecMonth').value;
+            const newYear = document.getElementById('editRecYear').value;
+            const newEmployee = document.getElementById('editRecEmployee').value;
+            const newWorkplace = document.getElementById('editRecWorkplace').value;
+
+            if (!newMonth || !newYear || !newEmployee || !newWorkplace) {
+                showNotification('يرجى ملء كافة بيانات السجل (الشهر، السنة، الموظف، مكان العمل)!', 'error');
+                return;
+            }
+
+            const newDetails = document.getElementById('editActDetails').value.trim();
+            const newParticipants = parseInt(document.getElementById('editActParticipants').value) || 0;
+            const newExecutor = document.getElementById('editActExecutor').value.trim();
+            const newTarget = document.getElementById('editActTarget').value.trim();
+            const newAttachments = document.getElementById('editActAttachments').value.trim();
+            const newDate = document.getElementById('editActDate').value;
+            const newNotes = document.getElementById('editActNotes').value.trim();
+
+            const saveBtn = document.getElementById('saveEditActBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '⏳ جاري الحفظ...';
+            }
+
+            showNotification('جاري حفظ التعديلات ومزامنتها...', 'info');
+
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const rIdx = records.findIndex(r => r.id && r.id.toString() === recordId.toString());
+            if (rIdx === -1 || !records[rIdx].activities || !records[rIdx].activities[actIndex]) {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 حفظ التعديلات';
+                }
+                showNotification('لم يتم العثور على النشاط في السجلات!', 'error');
+                return;
+            }
+
+            const oldRecord = records[rIdx];
+            const oldAct = oldRecord.activities[actIndex];
+
+            const updatedAct = {
+                ...oldAct,
+                name: newName,
+                details: newDetails,
+                participants: newParticipants,
+                executor: newExecutor,
+                target: newTarget,
+                attachments: newAttachments,
+                date: newDate,
+                notes: newNotes
+            };
+
+            const now = new Date();
+            const scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            const metaChanged = (oldRecord.month !== newMonth || oldRecord.year !== newYear || oldRecord.employee !== newEmployee || oldRecord.workplace !== newWorkplace);
+
+            if (!metaChanged) {
+                oldRecord.activities[actIndex] = updatedAct;
+                oldRecord.timestamp = now.getTime();
+                oldRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                oldRecord.updatedBy = currentUser;
+                
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                cachedCumulativeRecords = records;
+                if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                    sendToGoogleSheets(oldRecord);
+                }
+            } else {
+                if (oldRecord.activities.length === 1) {
+                    oldRecord.month = newMonth;
+                    oldRecord.year = newYear;
+                    oldRecord.employee = newEmployee;
+                    oldRecord.workplace = newWorkplace;
+                    oldRecord.activities[0] = updatedAct;
+                    oldRecord.timestamp = now.getTime();
+                    oldRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                    oldRecord.updatedBy = currentUser;
+
+                    localStorage.setItem('sharedRecords', JSON.stringify(records));
+                    cachedCumulativeRecords = records;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        sendToGoogleSheets(oldRecord);
+                    }
+                } else {
+                    oldRecord.activities.splice(actIndex, 1);
+                    oldRecord.timestamp = now.getTime();
+                    oldRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                    oldRecord.updatedBy = currentUser;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        sendToGoogleSheets(oldRecord);
+                    }
+
+                    const targetIdx = records.findIndex(r => r.month === newMonth && r.year === newYear && r.employee === newEmployee && r.workplace === newWorkplace && r.id.toString() !== oldRecord.id.toString());
+
+                    if (targetIdx !== -1) {
+                        const targetRec = records[targetIdx];
+                        const tLen = targetRec.activities ? targetRec.activities.length : 0;
+                        targetRec.activities = targetRec.activities || [];
+                        targetRec.activities.push({ ...updatedAct, t: tLen + 1 });
+                        targetRec.timestamp = now.getTime();
+                        targetRec.lastUpdated = now.toLocaleString('ar-IQ');
+                        targetRec.updatedBy = currentUser;
+                        if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                            sendToGoogleSheets(targetRec);
+                        }
+                    } else {
+                        const newRec = {
+                            id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                            timestamp: now.getTime(),
+                            date: now.toLocaleString('ar-IQ'),
+                            month: newMonth,
+                            year: newYear,
+                            employee: newEmployee,
+                            workplace: newWorkplace,
+                            activities: [{ ...updatedAct, t: 1 }],
+                            savedBy: currentUser,
+                            lastUpdated: now.toLocaleString('ar-IQ'),
+                            updatedBy: currentUser,
+                            expiryDate: now.getTime() + (31 * 24 * 60 * 60 * 1000)
+                        };
+                        records.push(newRec);
+                        if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                            sendToGoogleSheets(newRec);
+                        }
+                    }
+
+                    localStorage.setItem('sharedRecords', JSON.stringify(records));
+                    cachedCumulativeRecords = records;
+                }
+            }
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '💾 حفظ التعديلات';
+            }
+
+            closeEditActivityModal();
+            renderCumulativeTables();
+            loadReports(true);
+            showNotification('تم حفظ التعديلات ومزامنتها بنجاح', 'success');
+        }
+
+        async function editActivityNameInAllRecords(oldName) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const newName = prompt('تعديل اسم النشاط في جميع السجلات:\nمن: ' + oldName + '\nإلى:', oldName);
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+            showNotification('جاري تعديل اسم النشاط في جميع السجلات...', 'info');
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const trimmedNew = newName.trim();
+            let modifiedCount = 0;
+            const promises = [];
+            const scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+
+            records.forEach(r => {
+                let changed = false;
+                if (r.activities) {
+                    r.activities.forEach(act => {
+                        if ((act.name || '').trim() === oldName) {
+                            act.name = trimmedNew;
+                            changed = true;
+                        }
+                    });
+                }
+                if (changed) {
+                    modifiedCount++;
+                    r.timestamp = Date.now();
+                    r.lastUpdated = new Date().toLocaleString('ar-IQ');
+                    r.updatedBy = currentUser;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        promises.push(sendToGoogleSheets(r));
+                    }
+                }
+            });
+
+            if (modifiedCount > 0) {
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                cachedCumulativeRecords = records;
+                try { await Promise.all(promises); } catch (err) { console.error(err); }
+                loadCumulativeReport(true);
+                loadReports(true);
+                showNotification('تم تعديل اسم النشاط في ' + modifiedCount + ' سجل بنجاح', 'success');
+            } else {
+                showNotification('لم يتم العثور على أي نشاط مطابق', 'info');
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEditActivityModal();
+            }
+        });
+
 
         function getFilteredCumulativeData() {
             const filterWorkplace = document.getElementById('cumFilterWorkplace') ? document.getElementById('cumFilterWorkplace').value : '';
