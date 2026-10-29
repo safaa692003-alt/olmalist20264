@@ -1370,31 +1370,51 @@
             const today = new Date();
             const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
 
-            let csv = '\uFEFF';
-            csv += 'وزارة التربية - المديرية العامة لتربية المثنى\n';
-            csv += 'قسم الاعداد والتدريب - استمارة النشاطات الشهرية\n\n';
-            csv += 'الشهر,' + data.m + ',السنة,' + data.y + ',العدد,' + data.acts.length + '\n';
-            csv += 'الموظف,' + data.e + '\n';
-            csv += 'مكان العمل,' + data.w + '\n';
-            csv += 'تاريخ الإصدار,' + todayStr + ',إجمالي المشتركين,' + totalParticipants + '\n\n';
-            csv += 'ت,النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+            let rows = '';
             data.acts.forEach((a, i) => {
-                csv += (i + 1) + ',';
-                csv += '"' + a.name + '",';
-                csv += '"' + a.details + '",';
-                csv += a.participants + ',';
-                csv += '"' + a.executor + '",';
-                csv += '"' + a.target + '",';
-                csv += '"' + a.attachments + '",';
-                csv += a.date + ',';
-                csv += '"' + a.notes + '"\n';
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(a.details) + '</td>' +
+                    '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                    '<td>' + escapeHtml(a.executor) + '</td>' +
+                    '<td>' + escapeHtml(a.target) + '</td>' +
+                    '<td>' + escapeHtml(a.attachments) + '</td>' +
+                    '<td>' + escapeHtml(a.date) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(a.notes) + '</td>' +
+                '</tr>';
             });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'استمارة_' + data.m + '_' + data.y + '.csv';
-            link.click();
-            showNotification('تم تصدير الملف إلى Excel', 'success');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="9" class="main-title">وزارة التربية - المديرية العامة لتربية المثنى</th></tr>' +
+                    '<tr><th colspan="9" class="sub-title">قسم الاعداد والتدريب - استمارة النشاطات الشهرية</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">الشهر</th><td class="stat-val">' + escapeHtml(data.m) + '</td>' +
+                        '<th class="stat-lbl">السنة</th><td class="stat-val">' + escapeHtml(data.y) + '</td>' +
+                        '<th class="stat-lbl">الموظف</th><td class="stat-val" colspan="4">' + escapeHtml(data.e) + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">مكان العمل</th><td class="stat-val" colspan="3">' + escapeHtml(data.w) + '</td>' +
+                        '<th class="stat-lbl">تاريخ الإصدار</th><td class="stat-val">' + todayStr + '</td>' +
+                        '<th class="stat-lbl">إجمالي المشتركين</th><td class="stat-val num" colspan="2">' + totalParticipants + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:90px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'استمارة_' + data.m + '_' + data.y + '.xls');
         }
 
         async function loadReports(forceRefresh = false) {
@@ -1822,13 +1842,78 @@
             }
         }
 
-        function downloadCSVFile(csvContent, fileName) {
-            const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function downloadExcelTable(tableHtml, fileName) {
+            if (!fileName.toLowerCase().endsWith('.xls')) {
+                fileName += '.xls';
+            }
+            const excelDoc = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                'xmlns:x="urn:schemas-microsoft-com:office:excel" ' +
+                'xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head>' +
+                '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' +
+                '<!--[if gte mso 9]><xml>' +
+                '<x:ExcelWorkbook>' +
+                '<x:ExcelWorksheets>' +
+                '<x:ExcelWorksheet>' +
+                '<x:Name>بيانات التقرير</x:Name>' +
+                '<x:WorksheetOptions>' +
+                '<x:DisplayRightToLeft/>' +
+                '</x:WorksheetOptions>' +
+                '</x:ExcelWorksheet>' +
+                '</x:ExcelWorksheets>' +
+                '</x:ExcelWorkbook>' +
+                '</xml><![endif]-->' +
+                '<style>' +
+                'body { font-family: Tahoma, Arial, sans-serif; direction: rtl; text-align: right; }' +
+                'table { border-collapse: collapse; width: 100%; direction: rtl; margin-bottom: 25px; }' +
+                'th, td { border: 1px solid #7f8c8d; padding: 7px 10px; font-size: 11pt; vertical-align: middle; }' +
+                'th { background-color: #8e44ad; color: #ffffff; font-weight: bold; text-align: center; }' +
+                'td { text-align: center; mso-number-format:"\\@"; }' +
+                '.text-right { text-align: right; }' +
+                '.num { mso-number-format:"0"; text-align: center; font-weight: bold; }' +
+                '.main-title { background-color: #1e3c72; color: #ffffff; font-size: 14pt; font-weight: bold; text-align: center; padding: 12px; }' +
+                '.sub-title { background-color: #2a5298; color: #ffffff; font-size: 12pt; font-weight: bold; text-align: center; padding: 8px; }' +
+                '.sec-title { background-color: #6c3483; color: #ffffff; font-size: 12pt; font-weight: bold; text-align: right; padding: 9px; }' +
+                '.wp-title { background-color: #2c3e50; color: #ffffff; font-size: 11pt; font-weight: bold; text-align: right; padding: 8px; }' +
+                '.stat-lbl { background-color: #f4ecf7; color: #6c3483; font-weight: bold; text-align: center; font-size: 11pt; }' +
+                '.stat-val { background-color: #ffffff; color: #27ae60; font-weight: bold; text-align: center; font-size: 12pt; mso-number-format:"0"; }' +
+                '</style>' +
+                '</head>' +
+                '<body dir="rtl">' +
+                tableHtml +
+                '</body>' +
+                '</html>';
+
+            const blob = new Blob(['\uFEFF' + excelDoc], { type: 'application/vnd.ms-excel;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = fileName;
+            document.body.appendChild(link);
             link.click();
-            showNotification('تم تصدير ملف Excel بنجاح', 'success');
+            document.body.removeChild(link);
+            showNotification('تم حفظ جدول Excel بنجاح وتوزيع البيانات على الأعمدة', 'success');
+        }
+
+        function downloadCSVFile(csvContent, fileName) {
+            const formattedCsv = (csvContent.startsWith('sep=') ? '' : 'sep=,\r\n') + csvContent;
+            const blob = new Blob(['\uFEFF' + formattedCsv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('تم تحميل الملف بنجاح', 'success');
         }
 
         // تصدير جدول إحصائيات شهر واحد منفصل
@@ -1858,13 +1943,44 @@
             const acts = Object.values(map).sort((a, b) => b.count - a.count);
             if (!acts.length) { showNotification('لا توجد بيانات لهذا الشهر!', 'error'); return; }
 
-            let csv = 'إحصائيات وتراكمي شهر,' + month + ' ' + year + '\n';
-            csv += 'أنشطة فريدة,' + acts.length + ',إجمالي التكرار,' + acts.reduce((s, a) => s + a.count, 0) + ',إجمالي المشاركين,' + totalParts + ',عدد الموظفين,' + emps.size + '\n\n';
-            csv += 'ت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
+            let rows = '';
             acts.forEach((a, i) => {
-                csv += (i + 1) + ',"' + a.name + '",' + a.count + ',' + a.participants + ',"' + [...new Set(a.dates)].join(' | ') + '","' + [...new Set(a.notes)].join(' | ') + '"\n';
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="num">' + a.count + '</td>' +
+                    '<td class="num">' + a.participants + '</td>' +
+                    '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                    '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                '</tr>';
             });
-            downloadCSVFile(csv, 'إحصائيات_شهر_' + month + '_' + year + '.csv');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="6" class="sec-title">📅 إحصائيات وتراكمي شهر: ' + escapeHtml(month) + ' ' + escapeHtml(year) + '</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">أنشطة فريدة</th><td class="stat-val num">' + acts.length + '</td>' +
+                        '<th class="stat-lbl">إجمالي التكرار</th><td class="stat-val num">' + acts.reduce((s, a) => s + a.count, 0) + '</td>' +
+                        '<th class="stat-lbl">المشاركين</th><td class="stat-val num">' + totalParts + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl" colspan="2">عدد الموظفين المشاركين</th>' +
+                        '<td class="stat-val num" colspan="4">' + emps.size + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th style="width:45px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th style="width:100px;">التكرار</th>' +
+                        '<th style="width:110px;">المشتركين</th>' +
+                        '<th>التواريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'إحصائيات_شهر_' + month + '_' + year + '.xls');
         }
 
         // تصدير إحصائيات جميع الأشهر كل شهر مفصول لوحده
@@ -1902,18 +2018,49 @@
                 return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
             });
 
-            let csv = 'التقرير الإحصائي التراكمي مفصولاً حسب الأشهر\n\n';
+            let tablesHtml = '<table><tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                '<tr><th colspan="6" class="sub-title">التقرير الإحصائي التراكمي مفصولاً حسب الأشهر</th></tr></table>';
+
             monthList.forEach(mObj => {
                 const acts = Object.values(mObj.map).sort((a, b) => b.count - a.count);
-                csv += '=== شهر: ' + mObj.month + ' ' + mObj.year + ' ===\n';
-                csv += 'أنشطة فريدة,' + acts.length + ',إجمالي التكرار,' + acts.reduce((s, a) => s + a.count, 0) + ',إجمالي المشاركين,' + mObj.totalParticipants + ',عدد الموظفين,' + mObj.employees.size + '\n';
-                csv += 'ت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
+                let rows = '';
                 acts.forEach((a, i) => {
-                    csv += (i + 1) + ',"' + a.name + '",' + a.count + ',' + a.participants + ',"' + [...new Set(a.dates)].join(' | ') + '","' + [...new Set(a.notes)].join(' | ') + '"\n';
+                    rows += '<tr>' +
+                        '<td class="num">' + (i + 1) + '</td>' +
+                        '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                        '<td class="num">' + a.count + '</td>' +
+                        '<td class="num">' + a.participants + '</td>' +
+                        '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                        '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                    '</tr>';
                 });
-                csv += '\n';
+
+                tablesHtml += '<table>' +
+                    '<thead>' +
+                        '<tr><th colspan="6" class="sec-title">📅 شهر: ' + escapeHtml(mObj.month) + ' ' + escapeHtml(mObj.year) + '</th></tr>' +
+                        '<tr>' +
+                            '<th class="stat-lbl">أنشطة فريدة</th><td class="stat-val num">' + acts.length + '</td>' +
+                            '<th class="stat-lbl">إجمالي التكرار</th><td class="stat-val num">' + acts.reduce((s, a) => s + a.count, 0) + '</td>' +
+                            '<th class="stat-lbl">المشاركين</th><td class="stat-val num">' + mObj.totalParticipants + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th class="stat-lbl" colspan="2">عدد الموظفين المشاركين</th>' +
+                            '<td class="stat-val num" colspan="4">' + mObj.employees.size + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th style="width:45px;">ت</th>' +
+                            '<th>النشاط</th>' +
+                            '<th style="width:100px;">التكرار في ' + escapeHtml(mObj.month) + '</th>' +
+                            '<th style="width:110px;">المشتركين</th>' +
+                            '<th>التواريخ</th>' +
+                            '<th>الملاحظات</th>' +
+                        '</tr>' +
+                    '</thead>' +
+                    '<tbody>' + rows + '</tbody>' +
+                '</table><br/>';
             });
-            downloadCSVFile(csv, 'إحصائيات_الأشهر_المنفصلة_' + new Date().toISOString().split('T')[0] + '.csv');
+
+            downloadExcelTable(tablesHtml, 'إحصائيات_الأشهر_المنفصلة_' + new Date().toISOString().split('T')[0] + '.xls');
         }
 
         // تصدير الجدول التراكمي الإجمالي فقط
@@ -1921,11 +2068,36 @@
             if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
             const data = getFilteredCumulativeData();
             if (!data.activities.length) { showNotification('لا توجد بيانات!', 'error'); return; }
-            let csv = 'الجدول التراكمي الإجمالي\n\nت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
+
+            let rows = '';
             data.activities.forEach((a, i) => {
-                csv += (i + 1) + ',"' + a.name + '",' + a.count + ',' + a.participants + ',"' + [...new Set(a.dates)].join(' | ') + '","' + [...new Set(a.notes)].join(' | ') + '"\n';
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="num">' + a.count + '</td>' +
+                    '<td class="num">' + a.participants + '</td>' +
+                    '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                    '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                '</tr>';
             });
-            downloadCSVFile(csv, 'الجدول_التراكمي_الإجمالي_' + new Date().toISOString().split('T')[0] + '.csv');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="6" class="sub-title">📋 الجدول التراكمي الإجمالي (جميع الأشهر والشعب المحددة)</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:45px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th style="width:100px;">إجمالي التكرار</th>' +
+                        '<th style="width:110px;">إجمالي المشتركين</th>' +
+                        '<th>التواريخ المسجلة</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'الجدول_التراكمي_الإجمالي_' + new Date().toISOString().split('T')[0] + '.xls');
         }
 
         // تصدير جدول شعبة معينة في شهر معين
@@ -1944,12 +2116,47 @@
             });
             if (!items.length) { showNotification('لا توجد نشاطات لتصديرها!', 'error'); return; }
 
-            let csv = 'نشاطات الشعبة:,' + workplace + ',الشهر:,' + month + ' ' + year + '\n\n';
-            csv += 'ت,الموظف المرسل,الشعبة / مكان العمل,الشهر / السنة,اسم النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+            let rows = '';
             items.forEach((it, idx) => {
-                csv += (idx + 1) + ',"' + it.employee + '","' + it.workplace + '","' + it.month + ' ' + it.year + '","' + (it.name || '') + '","' + (it.details || '') + '",' + (parseInt(it.participants) || 0) + ',"' + (it.executor || '') + '","' + (it.target || '') + '","' + (it.attachments || '') + '","' + (it.date || '') + '","' + (it.notes || '') + '"\n';
+                rows += '<tr>' +
+                    '<td class="num">' + (idx + 1) + '</td>' +
+                    '<td><strong>' + escapeHtml(it.employee) + '</strong></td>' +
+                    '<td>' + escapeHtml(it.workplace) + '</td>' +
+                    '<td>' + escapeHtml(it.month + ' ' + it.year) + '</td>' +
+                    '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(it.name) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.details) + '</td>' +
+                    '<td class="num">' + (parseInt(it.participants) || 0) + '</td>' +
+                    '<td>' + escapeHtml(it.executor) + '</td>' +
+                    '<td>' + escapeHtml(it.target) + '</td>' +
+                    '<td>' + escapeHtml(it.attachments) + '</td>' +
+                    '<td>' + escapeHtml(it.date) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.notes) + '</td>' +
+                '</tr>';
             });
-            downloadCSVFile(csv, 'نشاطات_' + workplace + '_' + month + '_' + year + '.csv');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="12" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="12" class="wp-title">🏢 نشاطات: ' + escapeHtml(workplace) + ' | 📅 شهر: ' + escapeHtml(month + ' ' + year) + '</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th>الشهر / السنة</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'نشاطات_' + workplace + '_' + month + '_' + year + '.xls');
         }
 
         // تصدير جميع أشهر شعبة معينة
@@ -1968,12 +2175,47 @@
             });
             if (!items.length) { showNotification('لا توجد نشاطات لتصديرها!', 'error'); return; }
 
-            let csv = 'جميع نشاطات الشعبة:,' + workplace + '\n\n';
-            csv += 'ت,الشهر,السنة,الموظف المرسل,اسم النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+            let rows = '';
             items.forEach((it, idx) => {
-                csv += (idx + 1) + ',"' + it.month + '","' + it.year + '","' + it.employee + '","' + (it.name || '') + '","' + (it.details || '') + '",' + (parseInt(it.participants) || 0) + ',"' + (it.executor || '') + '","' + (it.target || '') + '","' + (it.attachments || '') + '","' + (it.date || '') + '","' + (it.notes || '') + '"\n';
+                rows += '<tr>' +
+                    '<td class="num">' + (idx + 1) + '</td>' +
+                    '<td><strong>' + escapeHtml(it.employee) + '</strong></td>' +
+                    '<td>' + escapeHtml(it.workplace) + '</td>' +
+                    '<td>' + escapeHtml(it.month + ' ' + it.year) + '</td>' +
+                    '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(it.name) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.details) + '</td>' +
+                    '<td class="num">' + (parseInt(it.participants) || 0) + '</td>' +
+                    '<td>' + escapeHtml(it.executor) + '</td>' +
+                    '<td>' + escapeHtml(it.target) + '</td>' +
+                    '<td>' + escapeHtml(it.attachments) + '</td>' +
+                    '<td>' + escapeHtml(it.date) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.notes) + '</td>' +
+                '</tr>';
             });
-            downloadCSVFile(csv, 'جميع_نشاطات_' + workplace + '.csv');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="12" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="12" class="wp-title">🏢 جميع نشاطات شعبة: ' + escapeHtml(workplace) + '</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th>الشهر / السنة</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'جميع_نشاطات_' + workplace + '.xls');
         }
 
         // تصدير جميع جداول الشعب التفصيلية
@@ -1982,18 +2224,55 @@
             const data = getFilteredCumulativeData();
             if (!data.records.length) { showNotification('لا توجد بيانات!', 'error'); return; }
 
-            let csv = 'جدول نشاطات الشعب التفصيلي حسب الأشهر\n\n';
-            csv += 'ت,الشعبة / مكان العمل,الشهر,السنة,الموظف المرسل,اسم النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+            let rows = '';
             let counter = 1;
             data.records.forEach(r => {
                 if (r.activities) {
                     r.activities.forEach(a => {
                         if (!a.name || !a.name.trim()) return;
-                        csv += (counter++) + ',"' + (r.workplace || '') + '","' + (r.month || '') + '","' + (r.year || '') + '","' + (r.employee || '') + '","' + (a.name || '') + '","' + (a.details || '') + '",' + (parseInt(a.participants) || 0) + ',"' + (a.executor || '') + '","' + (a.target || '') + '","' + (a.attachments || '') + '","' + (a.date || '') + '","' + (a.notes || '') + '"\n';
+                        rows += '<tr>' +
+                            '<td class="num">' + (counter++) + '</td>' +
+                            '<td>' + escapeHtml(r.workplace || '') + '</td>' +
+                            '<td>' + escapeHtml(r.month || '') + '</td>' +
+                            '<td>' + escapeHtml(r.year || '') + '</td>' +
+                            '<td><strong>' + escapeHtml(r.employee || '') + '</strong></td>' +
+                            '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.details || '') + '</td>' +
+                            '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                            '<td>' + escapeHtml(a.executor || '') + '</td>' +
+                            '<td>' + escapeHtml(a.target || '') + '</td>' +
+                            '<td>' + escapeHtml(a.attachments || '') + '</td>' +
+                            '<td>' + escapeHtml(a.date || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.notes || '') + '</td>' +
+                        '</tr>';
                     });
                 }
             });
-            downloadCSVFile(csv, 'نشاطات_الشعب_التفصيلية_' + new Date().toISOString().split('T')[0] + '.csv');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="13" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="13" class="sub-title">🏢 جدول نشاطات الشعب التفصيلي الكامل (حسب الأشهر والشعب)</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th style="width:70px;">الشهر</th>' +
+                        '<th style="width:60px;">السنة</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'نشاطات_الشعب_التفصيلية_' + new Date().toISOString().split('T')[0] + '.xls');
         }
 
         // تصدير جدول حسابات المستخدمين في لوحة التحكم
@@ -2003,11 +2282,34 @@
             const arr = Object.keys(users).map(u => ({ username: u, ...users[u] }));
             if (!arr.length) { showNotification('لا يوجد مستخدمون!', 'error'); return; }
 
-            let csv = 'جدول حسابات المستخدمين\n\nت,اسم المستخدم,كلمة المرور,الصلاحية,تاريخ الإضافة,أُضيف بواسطة\n';
+            let rows = '';
             arr.forEach((u, i) => {
-                csv += (i + 1) + ',"' + u.username + '","' + u.password + '","' + (u.role === 'admin' ? 'أدمن' : 'مستخدم') + '","' + new Date(u.createdAt).toLocaleDateString('ar-IQ') + '","' + (u.createdBy || '-') + '"\n';
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td><strong>' + escapeHtml(u.username) + '</strong></td>' +
+                    '<td>' + escapeHtml(u.password) + '</td>' +
+                    '<td>' + (u.role === 'admin' ? '<strong style="color:red;">أدمن</strong>' : 'مستخدم') + '</td>' +
+                    '<td>' + new Date(u.createdAt).toLocaleDateString('ar-IQ') + '</td>' +
+                    '<td>' + escapeHtml(u.createdBy || '-') + '</td>' +
+                '</tr>';
             });
-            downloadCSVFile(csv, 'حسابات_المستخدمين_' + new Date().toISOString().split('T')[0] + '.csv');
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">لوحة تحكم الأدمن - جدول حسابات المستخدمين</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>اسم المستخدم</th>' +
+                        '<th>كلمة المرور</th>' +
+                        '<th>الصلاحية</th>' +
+                        '<th>تاريخ الإضافة</th>' +
+                        '<th>أُضيف بواسطة</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'حسابات_المستخدمين_' + new Date().toISOString().split('T')[0] + '.xls');
         }
 
         async function deleteSingleActivityFromRecord(recordId, actIndex) {
@@ -2504,30 +2806,133 @@
             if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
             const data = getFilteredCumulativeData();
             if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
-            let csv = 'التقرير التراكمي الإحصائي العام\n\nت,النشاط,التكرار,المشتركين,التواريخ,الملاحظات\n';
-            data.activities.forEach((a, i) => { csv += (i+1) + ',"' + a.name + '",' + a.count + ',' + a.participants + ',"' + [...new Set(a.dates)].join(' | ') + '","' + [...new Set(a.notes)].join(' | ') + '"\n'; });
-            
-            csv += '\n\nجدول نشاطات الشعب التفصيلي حسب الأشهر\n';
-            csv += 'الشعبة / مكان العمل,الشهر,السنة,الموظف المرسل,اسم النشاط,التفاصيل,المشتركين,جهة التنفيذ,الجهة المستهدفة,المرفقات,التاريخ,الملاحظات\n';
+
+            // 1. الجدول التراكمي الإجمالي العام
+            let summaryRows = '';
+            data.activities.forEach((a, i) => {
+                summaryRows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="num">' + a.count + '</td>' +
+                    '<td class="num">' + a.participants + '</td>' +
+                    '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                    '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                '</tr>';
+            });
+
+            // 2. جدول نشاطات الشعب التفصيلي الكامل
+            let detailedRows = '';
+            let counter = 1;
             data.records.forEach(r => {
                 if (r.activities) {
                     r.activities.forEach(a => {
                         if (!a.name || !a.name.trim()) return;
-                        csv += '"' + (r.workplace || '') + '","' + (r.month || '') + '","' + (r.year || '') + '","' + (r.employee || '') + '","' + (a.name || '') + '","' + (a.details || '') + '",' + (parseInt(a.participants) || 0) + ',"' + (a.executor || '') + '","' + (a.target || '') + '","' + (a.attachments || '') + '","' + (a.date || '') + '","' + (a.notes || '') + '"\n';
+                        detailedRows += '<tr>' +
+                            '<td class="num">' + (counter++) + '</td>' +
+                            '<td>' + escapeHtml(r.workplace || '') + '</td>' +
+                            '<td>' + escapeHtml(r.month || '') + '</td>' +
+                            '<td>' + escapeHtml(r.year || '') + '</td>' +
+                            '<td><strong>' + escapeHtml(r.employee || '') + '</strong></td>' +
+                            '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.details || '') + '</td>' +
+                            '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                            '<td>' + escapeHtml(a.executor || '') + '</td>' +
+                            '<td>' + escapeHtml(a.target || '') + '</td>' +
+                            '<td>' + escapeHtml(a.attachments || '') + '</td>' +
+                            '<td>' + escapeHtml(a.date || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.notes || '') + '</td>' +
+                        '</tr>';
                     });
                 }
             });
 
-            downloadCSVFile(csv, 'التقرير_التراكمي_الكامل_' + new Date().toISOString().split('T')[0] + '.csv');
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="6" class="sub-title">التقرير التراكمي الشامل لنشاطات الشعب</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">إجمالي الأنشطة الفريدة</th><td class="stat-val num">' + data.activities.length + '</td>' +
+                        '<th class="stat-lbl">إجمالي المشاركين</th><td class="stat-val num">' + data.totalParticipants + '</td>' +
+                        '<th class="stat-lbl">عدد الموظفين</th><td class="stat-val num">' + data.employees.size + '</td>' +
+                    '</tr>' +
+                    '<tr><th colspan="6" class="sec-title">أولاً: الجدول التراكمي الإجمالي العام</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:45px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th style="width:100px;">إجمالي التكرار</th>' +
+                        '<th style="width:110px;">إجمالي المشتركين</th>' +
+                        '<th>التواريخ المسجلة</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + summaryRows + '</tbody>' +
+            '</table><br/><br/>' +
+            '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="13" class="wp-title">ثانياً: جدول نشاطات الشعب التفصيلي الكامل حسب الأشهر</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th style="width:70px;">الشهر</th>' +
+                        '<th style="width:60px;">السنة</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + detailedRows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'التقرير_التراكمي_الكامل_' + new Date().toISOString().split('T')[0] + '.xls');
         }
 
         function exportExcel() {
             if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
             const records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
             if (!records.length) { showNotification('لا توجد بيانات!', 'error'); return; }
-            let csv = 'التاريخ,الموظف,مكان العمل,الشهر,السنة,النشاط,التفاصيل,المشتركين\n';
-            records.forEach(r => r.activities.forEach(a => csv += '"' + r.date + '","' + r.employee + '","' + r.workplace + '","' + r.month + '","' + r.year + '","' + a.name + '","' + a.details + '","' + a.participants + '"\n'));
-            downloadCSVFile(csv, 'تقرير_' + new Date().toISOString().split('T')[0] + '.csv');
+
+            let rows = '';
+            records.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        rows += '<tr>' +
+                            '<td>' + escapeHtml(r.date || '') + '</td>' +
+                            '<td><strong>' + escapeHtml(r.employee || '') + '</strong></td>' +
+                            '<td>' + escapeHtml(r.workplace || '') + '</td>' +
+                            '<td>' + escapeHtml(r.month || '') + '</td>' +
+                            '<td>' + escapeHtml(r.year || '') + '</td>' +
+                            '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.details || '') + '</td>' +
+                            '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                        '</tr>';
+                    });
+                }
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="8" class="main-title">سجل التقارير المحفوظة</th></tr>' +
+                    '<tr>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الموظف</th>' +
+                        '<th>مكان العمل</th>' +
+                        '<th>الشهر</th>' +
+                        '<th>السنة</th>' +
+                        '<th>النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th>المشتركين</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'تقرير_السجلات_' + new Date().toISOString().split('T')[0] + '.xls');
         }
 
         function showNotification(msg, type) {
