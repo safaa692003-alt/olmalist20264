@@ -1,0 +1,3054 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة استمارة النشاطات - مديرية تربية المثنى</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', 'Tahoma', sans-serif; }
+        body { background: #f0f2f5; min-height: 100vh; }
+
+        .main-header { background: #fff; border-bottom: 3px solid #1e3c72; position: sticky; top: 0; z-index: 50; }
+        .header-top { background: #1e3c72; color: #fff; padding: 6px 20px; text-align: center; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .header-main { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 8px 20px; gap: 15px; min-height: 75px; max-width: 1400px; margin: 0 auto; }
+        .header-right { text-align: right; }
+        .header-right h1 { font-size: 20px; color: #1e3c72; margin-bottom: 2px; font-weight: bold; }
+        .header-right h2 { font-size: 14px; color: #2a5298; padding-top: 2px; border-top: 1px solid #ddd; display: inline-block; }
+        .header-logo { text-align: center; padding: 0 10px; }
+        .header-logo img { width: 70px; height: 70px; object-fit: contain; }
+        .header-left { text-align: left; }
+        .header-left h1 { font-size: 18px; color: #1e3c72; margin-bottom: 2px; font-weight: bold; }
+        .header-left h2 { font-size: 13px; color: #2a5298; padding-top: 2px; border-top: 1px solid #ddd; display: inline-block; }
+
+        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 10px 20px; display: none; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .navbar.show { display: flex; }
+        .nav-links { display: flex; gap: 5px; list-style: none; flex-wrap: wrap; }
+        .nav-links button { background: rgba(255,255,255,0.15); color: #fff; border: none; padding: 7px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .nav-links button:hover, .nav-links button.active { background: rgba(255,255,255,0.3); }
+        .user-area { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .user-area button { background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; }
+        .admin-badge { background: gold !important; color: #1e3c72 !important; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin-left: 5px; }
+        .role-badge.user { background: #27ae60 !important; color: #fff !important; padding: 2px 6px; border-radius: 8px; font-size: 10px; margin-left: 5px; }
+
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 180px); padding: 40px 20px; }
+        .login-box { background: #fff; padding: 40px 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-header h1 { color: #333; font-size: 22px; margin-bottom: 5px; }
+        .login-header p { color: #777; font-size: 13px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 6px; color: #555; font-size: 13px; }
+        .form-group input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background: #f8f9fa; }
+        .form-group input:focus { outline: none; border-color: #667eea; background: #fff; }
+        .login-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; }
+        .error-msg { background: #fee; color: #c33; padding: 8px; border-radius: 6px; margin-top: 10px; text-align: center; font-size: 13px; display: none; }
+
+        .main-content { padding: 20px; max-width: 1500px; margin: 0 auto; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .form-container, .reports-container, .cumulative-container, .admin-container { background: #fff; border-radius: 12px; box-shadow: 0 3px 15px rgba(0,0,0,0.06); padding: 25px; }
+        .form-section-title { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; }
+        .form-section-title h2 { font-size: 18px; margin: 0; }
+        .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .form-row label { color: #1e3c72; margin-bottom: 6px; font-size: 13px; display: block; padding-bottom: 4px; border-bottom: 1px solid #667eea; }
+        .form-row label .required-star { color: #e74c3c; }
+        .form-row select, .form-row input { width: 100%; padding: 10px 12px; border: 2px solid #1e3c72 !important; border-radius: 8px; font-size: 13px; background: #fff !important; }
+        .form-row select:focus, .form-row input:focus { outline: none; border-color: #8e44ad !important; }
+
+        .table-section { margin-top: 20px; }
+        .table-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+        .add-row-btn { background: #27ae60; color: #fff; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 13px; }
+        .table-wrapper { overflow-x: auto; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
+        thead { background: #1e3c72; color: #fff; }
+        th { padding: 10px 8px; text-align: center; font-size: 12px; }
+        td { padding: 8px; border-bottom: 1px solid #e0e0e0; text-align: center; font-size: 12px; }
+        tbody input, tbody select, tbody textarea { width: 100%; padding: 6px; border: 1px solid #e0e0e0; border-radius: 4px; font-size: 12px; }
+        tbody textarea { resize: vertical; min-height: 30px; }
+        .delete-btn { background: #e74c3c; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; }
+
+        .action-buttons { display: flex; gap: 10px; justify-content: center; margin-top: 20px; flex-wrap: wrap; }
+        .action-buttons button { padding: 10px 20px; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; color: #fff; }
+        .save-btn { background: #27ae60; }
+        .print-btn { background: #3498db; }
+        .clear-btn { background: #e67e22; }
+        .word-btn { background: #2a5298; }
+        .excel-btn { background: #16a085; }
+
+        .signature-section { display: none; }
+
+        .stats-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .stat-card { background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-right: 3px solid #667eea; }
+        .stat-card.green { border-right-color: #27ae60; }
+        .stat-card.orange { border-right-color: #e67e22; }
+        .stat-card.red { border-right-color: #e74c3c; }
+        .stat-card.purple { border-right-color: #9b59b6; }
+        .stat-card .stat-value { font-size: 24px; font-weight: bold; color: #333; }
+        .stat-card .stat-label { font-size: 12px; color: #777; margin-top: 3px; }
+
+        .admin-container .form-section-title { background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%); }
+        .admin-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .admin-stat-card { background: linear-gradient(135deg, #fff5e6 0%, #ffe0b3 100%); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-right: 3px solid #c0392b; }
+        .admin-stat-card .stat-value { color: #c0392b; }
+        .add-user-form { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #c0392b; }
+        .add-user-form h3 { color: #c0392b; margin-bottom: 15px; font-size: 16px; }
+        .export-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 15px; }
+        .export-btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; color: #fff; }
+        .export-btn.pdf { background: #e74c3c; }
+        .export-btn.excel { background: #27ae60; }
+        .export-btn.print { background: #3498db; }
+        .export-btn.refresh { background: #9b59b6; }
+        .reports-table-wrapper { overflow-x: auto; border-radius: 8px; }
+        .reports-table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        .reports-table thead { background: #2c3e50; }
+        .reports-table th { padding: 10px 8px; color: #fff; font-size: 12px; }
+        .reports-table td { padding: 10px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; }
+        .admin-table thead { background: #c0392b; }
+        .cumulative-table thead { background: #8e44ad; }
+        .activity-count { display: inline-block; background: #8e44ad; color: #fff; padding: 3px 8px; border-radius: 10px; font-size: 11px; }
+        .participants-sum { color: #27ae60; font-weight: bold; }
+        .btn-view, .btn-delete, .btn-edit, .btn-role-admin, .btn-role-user { padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 10px; color: #fff; }
+        .btn-view { background: #3498db; }
+        .btn-edit { background: #f39c12; }
+        .btn-delete { background: #e74c3c; }
+        .btn-role-admin { background: #c0392b; }
+        .btn-role-user { background: #27ae60; }
+        .network-info { background: #e8f5e9; padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #2e7d32; }
+        .pulse-dot { display: inline-block; width: 8px; height: 8px; background: #27ae60; border-radius: 50%; margin-left: 5px; }
+        .cumulative-info { background: linear-gradient(135deg, #f4ecf7 0%, #e8d5f0 100%); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; border-right: 3px solid #8e44ad; font-size: 12px; color: #6c3483; }
+        .admin-info { background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%); padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; border-right: 3px solid #c0392b; font-size: 12px; color: #c62828; }
+        .user-notice { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 10px 15px; border-radius: 8px; margin-bottom: 15px; border-right: 3px solid #2196f3; font-size: 12px; color: #1565c0; }
+        .notification { position: fixed; top: 200px; left: 50%; transform: translateX(-50%); padding: 12px 25px; border-radius: 8px; color: #fff; z-index: 2000; display: none; }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #3498db; }
+
+        /* نافذة منبثقة لتعديل بيانات النشاط */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+            padding: 15px;
+            backdrop-filter: blur(2px);
+        }
+        .modal-overlay.show {
+            display: flex;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 820px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border: 2px solid #1e3c72;
+            animation: modalFadeIn 0.2s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .modal-header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: #fff;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .modal-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .modal-close-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            transition: background 0.2s;
+        }
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .modal-body .form-row label {
+            color: #1e3c72;
+            font-weight: bold;
+        }
+        .modal-footer {
+            padding: 12px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .app-footer { background: #1e3c72; color: #fff; padding: 20px; text-align: center; margin-top: 30px; border-top: 3px solid gold; }
+        .app-footer .footer-content { max-width: 1500px; margin: 0 auto; }
+        .app-footer .footer-title { font-size: 16px; margin-bottom: 6px; }
+        .app-footer .footer-name { font-size: 18px; color: gold; margin: 3px 0; }
+        .app-footer .footer-position { font-size: 14px; color: #b8d4f0; margin-bottom: 8px; }
+        .app-footer .footer-divider { width: 80px; height: 2px; background: gold; margin: 10px auto; }
+        .app-footer .footer-copyright { font-size: 11px; color: #95b3d6; margin-top: 8px; }
+
+        @media (max-width: 768px) {
+            .header-main { grid-template-columns: 1fr; text-align: center; padding: 8px !important; }
+            .header-right, .header-left { text-align: center; }
+            .header-logo img { width: 55px !important; height: 55px !important; }
+        }
+
+        /* ============================================================ */
+        /* ✅ أنماط الطباعة - تقرير نظيف A4 */
+        /* ============================================================ */
+        @media print {
+            @page { size: A4; margin: 1cm 1cm 1cm 1cm; }
+            body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-size: 11pt; }
+
+            #mainNavbar, #userNotice, .add-row-btn, .action-buttons, .export-buttons, .app-footer, .delete-btn, .btn-delete, .btn-edit, .modal-overlay, .header-top, .form-section-title, .logo-ring { display: none !important; }
+
+            .main-content { padding: 0 !important; max-width: 100% !important; margin: 0 !important; }
+            .form-container, .reports-container, .cumulative-container, .admin-container { box-shadow: none !important; padding: 0 !important; border-radius: 0 !important; background: #fff !important; }
+
+            /* الترويسة - نظيف وواضح */
+            .main-header { position: static !important; box-shadow: none !important; border: 2px solid #000 !important; border-radius: 0 !important; padding: 8px 5px !important; margin-bottom: 5px !important; }
+            .header-main { min-height: 70px !important; padding: 5px 0 !important; gap: 15px !important; }
+            .header-logo img { width: 60px !important; height: 60px !important; }
+            .header-right h1, .header-left h1 { font-size: 13pt !important; color: #000 !important; margin-bottom: 3px !important; }
+            .header-right h2, .header-left h2 { font-size: 11pt !important; color: #000 !important; border-top: 1px solid #000 !important; padding-top: 2px !important; }
+
+            /* حقول النموذج - نظيفة ومرتبة */
+            .form-row { display: grid !important; grid-template-columns: repeat(2, 1fr) !important; gap: 5px !important; margin-bottom: 5px !important; page-break-inside: avoid !important; }
+            .form-row > div { border: 1px solid #000 !important; padding: 3px 6px !important; background: #fff !important; }
+            .form-row label { font-size: 10pt !important; color: #000 !important; margin-bottom: 2px !important; padding-bottom: 0 !important; border-bottom: 1px dashed #999 !important; display: block !important; }
+            .form-row select, .form-row input { padding: 2px 4px !important; font-size: 11pt !important; border: none !important; background: transparent !important; box-shadow: none !important; color: #000 !important; }
+
+            /* الجدول */
+            .table-section { margin-top: 8px !important; page-break-inside: auto !important; }
+            .table-title { display: none !important; }
+            table { width: 100% !important; border-collapse: collapse !important; min-width: auto !important; font-size: 10pt !important; page-break-inside: auto !important; }
+            tr { page-break-inside: avoid !important; }
+            thead { display: table-header-group !important; -webkit-print-color-adjust: exact !important; }
+            th { background: #d9d9d9 !important; color: #000 !important; border: 1px solid #000 !important; padding: 6px 3px !important; font-size: 10pt !important; font-weight: bold !important; }
+            td { border: 1px solid #000 !important; padding: 5px 3px !important; font-size: 10pt !important; color: #000 !important; }
+            tbody input, tbody select, tbody textarea { border: none !important; padding: 1px !important; font-size: 10pt !important; background: transparent !important; color: #000 !important; }
+
+            /* التوقيعات - مساحة كبيرة */
+            .signature-section { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important; margin-top: 50px !important; padding: 0 10px !important; page-break-inside: avoid !important; }
+            .signature-box { text-align: center; }
+            .signature-box .sig-label { font-size: 11pt !important; color: #000 !important; margin-bottom: 8px !important; }
+            .signature-box .sig-role { font-size: 11pt !important; color: #000 !important; margin-top: 5px !important; font-weight: bold !important; }
+            .signature-box .sig-name { font-size: 11pt !important; color: #000 !important; margin-top: 3px !important; font-weight: bold !important; }
+            .signature-box .sig-line { border-bottom: 2px solid #000 !important; width: 80%; margin: 0 auto 5px; height: 50px !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-top">
+            <div class="datetime" id="currentDateTime">--</div>
+            <div>الجمهورية العراقية - وزارة التربية</div>
+        </div>
+        <div class="header-main">
+            <div class="header-right">
+                <h1>وزارة التربية</h1>
+                <h2>المديرية العامة لتربية المثنى</h2>
+            </div>
+            <div class="header-logo">
+                <div class="logo-ring"></div>
+                <img src="logo1.png" alt="شعار وزارة التربية" onerror="this.style.display='none'">
+            </div>
+            <div class="header-left">
+                <h1>قسم الاعداد والتدريب</h1>
+                <h2>استمارة النشاطات الشهرية</h2>
+            </div>
+        </div>
+    </header>
+
+    <nav class="navbar" id="mainNavbar">
+        <div class="nav-title">نظام إدارة النشاطات</div>
+        <ul class="nav-links">
+            <li><button class="active" id="navFormBtn" onclick="showPage('formPage')">الاستمارة</button></li>
+            <li><button id="navReportsBtn" onclick="showPage('reportsPage')">التقارير</button></li>
+            <li><button id="navCumulativeBtn" onclick="showPage('cumulativePage')">التقرير التراكمي</button></li>
+            <li><button id="navAdminBtn" class="admin-only" onclick="showPage('adminPage')" style="display:none;">لوحة التحكم</button></li>
+        </ul>
+        <div class="user-area">
+            <span class="user-name"><span id="userRoleBadge"></span><span id="userDisplay">مستخدم</span></span>
+            <button onclick="logout()">خروج</button>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="page active" id="loginPage">
+            <div class="login-container">
+                <div class="login-box">
+                    <div class="login-header">
+                        <h1>نظام إدارة النشاطات</h1>
+                        <p>الرجاء تسجيل الدخول للمتابعة</p>
+                    </div>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="username">اسم المستخدم</label>
+                            <input type="text" id="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">كلمة المرور</label>
+                            <input type="password" id="password" required>
+                        </div>
+                        <button type="submit" class="login-btn">تسجيل الدخول</button>
+                        <div class="error-msg" id="errorMsg">اسم المستخدم أو كلمة المرور غير صحيحة!</div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="formPage">
+            <div class="form-container">
+                <div class="form-section-title"><h2>استمارة النشاطات الشهرية</h2></div>
+                <div class="user-notice" id="userNotice" style="display:none;"><strong>ملاحظة:</strong> حسابك مخصص لتعبئة الاستمارة فقط.</div>
+                <div class="form-row">
+                    <div><label>الشهر <span class="required-star">*</span></label><select id="month"><option value="">-- اختر --</option><option value="يناير">يناير</option><option value="فبراير">فبراير</option><option value="مارس">مارس</option><option value="أبريل">أبريل</option><option value="مايو">مايو</option><option value="يونيو">يونيو</option><option value="يوليو">يوليو</option><option value="أغسطس">أغسطس</option><option value="سبتمبر">سبتمبر</option><option value="أكتوبر">أكتوبر</option><option value="نوفمبر">نوفمبر</option><option value="ديسمبر">ديسمبر</option></select></div>
+                    <div><label>السنة <span class="required-star">*</span></label><select id="year"><option value="">-- اختر --</option><option value="2026">2026</option><option value="2027">2027</option><option value="2028">2028</option><option value="2029">2029</option><option value="2030">2030</option></select></div>
+                    <div><label>الموظف المسؤول <span class="required-star">*</span></label><select id="employee"><option value="">-- اختر --</option><option value="م.م صفاء هادي">م.م صفاء هادي</option><option value="حمزة جابر علوان">حمزة جابر علوان</option><option value="فاطمة علوان">فاطمة علوان</option><option value="حسين عباس">حسين عباس</option><option value="م.م طاهر طالب">م.م طاهر طالب</option><option value="م.م حسين فالح">م.م حسين فالح</option><option value="ستار عبد اكعيم">ستار عبد اكعيم</option><option value="ضرغام ماجد">ضرغام ماجد</option></select></div>
+                    <div><label>مكان العمل <span class="required-star">*</span></label><select id="workplace"><option value="">-- اختر --</option><option value="مدير القسم">مدير القسم</option><option value="معاون مدير القسم">معاون مدير القسم</option><option value="مكتب رئيس القسم">مكتب رئيس القسم</option><option value="شعبة التدريب">شعبة التدريب</option><option value="شعبة المعاهد">شعبة المعاهد</option><option value="شعبة البحوث والدراسات">شعبة البحوث والدراسات</option><option value="شعبة الاشغال اليدوية">شعبة الاشغال اليدوية</option><option value="وحدة اللغة العربية">وحدة اللغة العربية</option></select></div>
+                </div>
+                <div class="table-section">
+                    <div class="table-title"><h2>جدول النشاطات</h2><button class="add-row-btn" onclick="addRow()">إضافة نشاط جديد</button></div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>ت</th><th>النشاط</th><th>التفاصيل</th><th>المشتركين</th><th>جهة التنفيذ</th><th>الجهة المستهدفة</th><th>المرفقات</th><th>التاريخ</th><th>الملاحظات</th><th>إجراء</th></tr></thead>
+                            <tbody id="tableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="signature-section">
+                    <div class="signature-box" style="text-align: right;">
+                        <div class="sig-label">التوقيع</div>
+                        <div class="sig-line"></div>
+                        <div class="sig-role">مسؤول الشعبة</div>
+                    </div>
+                    <div class="signature-box" style="text-align: left;">
+                        <div class="sig-label">التوقيع</div>
+                        <div class="sig-line"></div>
+                        <div class="sig-role">مدير القسم</div>
+                        <div class="sig-name">م.م صفاء هادي عبد العالي</div>
+                    </div>
+                </div>
+                <div class="action-buttons">
+                    <button class="save-btn" onclick="saveForm()">حفظ الاستمارة</button>
+                    <button class="print-btn" onclick="window.print()">طباعة</button>
+                    <button class="word-btn" onclick="exportWord()">تصدير Word</button>
+                    <button class="excel-btn" onclick="exportFormExcel()">تصدير Excel</button>
+                    <button class="export-json-btn" onclick="exportFormJSON()" style="background:#8e44ad;">تصدير كملف بيانات (JSON)</button>
+                    <button class="clear-btn" onclick="clearForm()">مسح البيانات</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="reportsPage">
+            <div class="reports-container">
+                <div class="form-section-title"><h2>التقارير والحركات</h2></div>
+                <div class="network-info"><span>مشاركة تلقائية للبيانات</span><span><span class="pulse-dot"></span> متصل</span></div>
+                <div class="stats-cards">
+                    <div class="stat-card"><div class="stat-value" id="totalRecords">0</div><div class="stat-label">إجمالي</div></div>
+                    <div class="stat-card green"><div class="stat-value" id="activeRecords">0</div><div class="stat-label">نشطة</div></div>
+                    <div class="stat-card orange"><div class="stat-value" id="expiringSoon">0</div><div class="stat-label">قارب الانتهاء</div></div>
+                    <div class="stat-card red"><div class="stat-value" id="expiredRecords">0</div><div class="stat-label">منتهية</div></div>
+                </div>
+                <div class="export-buttons">
+                    <button class="export-btn pdf" onclick="exportPDF()">PDF</button>
+                    <button class="export-btn excel" onclick="exportExcel()">Excel</button>
+                    <button class="export-btn refresh" onclick="loadReports(true)">تحديث</button>
+                    <button class="export-btn import" onclick="triggerImportJSON()" style="background:#e67e22;">استيراد ملف استمارة (JSON)</button>
+                    <input type="file" id="importJsonInput" accept=".json" style="display:none;" onchange="importFormJSON(event)">
+                </div>
+                <div class="reports-table-wrapper">
+                    <table class="reports-table">
+                        <thead><tr><th>#</th><th>التاريخ</th><th>الموظف</th><th>مكان العمل</th><th>الشهر/السنة</th><th>الأنشطة</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="reportsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="cumulativePage">
+            <div class="cumulative-container">
+                <div class="form-section-title" style="background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%);"><h2>التقرير التراكمي</h2></div>
+                <div class="cumulative-info"><strong>يجمع جميع النشاطات من الموظفين</strong></div>
+                <div class="stats-cards">
+                    <div class="stat-card purple"><div class="stat-value" id="totalUniqueActivities">0</div><div class="stat-label">أنشطة فريدة</div></div>
+                    <div class="stat-card green"><div class="stat-value" id="totalActivitiesCount">0</div><div class="stat-label">إجمالي التكرار</div></div>
+                    <div class="stat-card orange"><div class="stat-value" id="totalParticipants">0</div><div class="stat-label">المشاركين</div></div>
+                    <div class="stat-card"><div class="stat-value" id="totalEmployees">0</div><div class="stat-label">الموظفين</div></div>
+                </div>
+                <div class="export-buttons" style="justify-content: space-between; align-items: center;">
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="export-btn pdf" onclick="exportCumulativePDF()">PDF</button>
+                        <button class="export-btn excel" onclick="exportCumulativeExcel()">📥 حفظ التقرير الكامل كملف Excel</button>
+                        <button class="export-btn print" onclick="printCumulativeReport()">طباعة</button>
+                        <button class="export-btn refresh" onclick="loadCumulativeReport(true)" style="background:#9b59b6;">تحديث</button>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+                        <select id="cumFilterWorkplace" onchange="renderCumulativeTables()" style="padding:7px 12px; border:2px solid #8e44ad; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                            <option value="">جميع الشعب / أماكن العمل</option>
+                            <option value="مدير القسم">مدير القسم</option>
+                            <option value="معاون مدير القسم">معاون مدير القسم</option>
+                            <option value="مكتب رئيس القسم">مكتب رئيس القسم</option>
+                            <option value="شعبة التدريب">شعبة التدريب</option>
+                            <option value="شعبة المعاهد">شعبة المعاهد</option>
+                            <option value="شعبة البحوث والدراسات">شعبة البحوث والدراسات</option>
+                            <option value="شعبة الاشغال اليدوية">شعبة الاشغال اليدوية</option>
+                            <option value="وحدة اللغة العربية">وحدة اللغة العربية</option>
+                        </select>
+                        <select id="cumFilterMonth" onchange="renderCumulativeTables()" style="padding:7px 12px; border:2px solid #8e44ad; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                            <option value="">جميع الأشهر</option>
+                            <option value="يناير">يناير</option>
+                            <option value="فبراير">فبراير</option>
+                            <option value="مارس">مارس</option>
+                            <option value="أبريل">أبريل</option>
+                            <option value="مايو">مايو</option>
+                            <option value="يونيو">يونيو</option>
+                            <option value="يوليو">يوليو</option>
+                            <option value="أغسطس">أغسطس</option>
+                            <option value="سبتمبر">سبتمبر</option>
+                            <option value="أكتوبر">أكتوبر</option>
+                            <option value="نوفمبر">نوفمبر</option>
+                            <option value="ديسمبر">ديسمبر</option>
+                        </select>
+                        <select id="cumFilterYear" onchange="renderCumulativeTables()" style="padding:7px 12px; border:2px solid #8e44ad; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                            <option value="">جميع السنوات</option>
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- قسم الإحصائيات والجدول التراكمي مفصولاً لكل شهر لوحده -->
+                <div style="margin-top: 15px; margin-bottom: 25px;">
+                    <div class="form-section-title" style="background: linear-gradient(135deg, #6c3483 0%, #8e44ad 100%); margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <h2>📊 الإحصائيات والتقرير التراكمي حسب كل شهر منفرداً</h2>
+                        <button class="export-btn excel" onclick="exportAllMonthlySummaryExcel()" style="background:#27ae60; font-weight:bold;">📥 حفظ إحصائيات جميع الأشهر Excel</button>
+                    </div>
+                    <div id="monthlySeparatedStatsContainer"></div>
+                </div>
+
+                <!-- الجدول التراكمي الإجمالي العام -->
+                <div style="margin-top: 25px;">
+                    <div class="form-section-title" style="background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); margin-bottom: 10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <h2>📋 الجدول التراكمي الإجمالي (جميع الأشهر المحددة)</h2>
+                        <button class="export-btn excel" onclick="exportSummaryTableOnlyExcel()" style="background:#27ae60; font-weight:bold;">📥 حفظ هذا الجدول كملف Excel</button>
+                    </div>
+                    <div class="reports-table-wrapper">
+                        <table class="reports-table cumulative-table">
+                            <thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th><th>الإجراءات</th></tr></thead>
+                            <tbody id="cumulativeTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <div class="form-section-title" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); margin-bottom: 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <h2>🏢 جدول نشاطات الشعب التفصيلي (حسب الأشهر والشعب كما أرسلها المستخدمون)</h2>
+                        <button class="export-btn excel" onclick="exportAllDetailedWorkplaceExcel()" style="background:#27ae60; font-weight:bold;">📥 حفظ جميع جداول الشعب كملف Excel</button>
+                    </div>
+                    <div id="detailedWorkplaceTablesContainer"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page" id="adminPage">
+            <div class="admin-container">
+                <div class="form-section-title"><h2>لوحة تحكم الأدمن</h2></div>
+                <div class="admin-info"><strong>منطقة محظورة:</strong> صفحة للأدمن فقط.</div>
+                <div class="admin-stats">
+                    <div class="admin-stat-card"><div class="stat-value" id="totalUsers">0</div><div class="stat-label">إجمالي المستخدمين</div></div>
+                    <div class="admin-stat-card"><div class="stat-value" id="totalAdmins">0</div><div class="stat-label">المسؤولون</div></div>
+                    <div class="admin-stat-card"><div class="stat-value" id="totalNormalUsers">0</div><div class="stat-label">المستخدمون</div></div>
+                </div>
+                <div class="add-user-form">
+                    <h3>إضافة مستخدم جديد</h3>
+                    <div class="form-row" style="margin-bottom: 0;">
+                        <div><label>اسم المستخدم *</label><input type="text" id="newUsername"></div>
+                        <div><label>كلمة المرور *</label><input type="text" id="newPassword"></div>
+                        <div><label>الصلاحية *</label><select id="newUserRole"><option value="user">مستخدم</option><option value="admin">أدمن</option></select></div>
+                        <div style="display: flex; align-items: end; gap: 5px;">
+                            <button onclick="generateCredentials()" style="padding:10px; background:#3498db; color:#fff; border:none; border-radius:8px; cursor:pointer;">توليد تلقائي</button>
+                            <button onclick="addNewUser()" style="padding:10px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer;">إضافة</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-user-form" style="border-color: #8e44ad;">
+                    <h3 style="color: #8e44ad;">إعدادات الربط بجوجل شيت (Google Sheets)</h3>
+                    <div class="form-row" style="margin-bottom: 0; grid-template-columns: 1fr auto auto; gap: 10px;">
+                        <div><label>رابط Google Apps Script Web App URL</label><input type="text" id="googleScriptUrl" placeholder="https://script.google.com/macros/s/.../exec"></div>
+                        <div style="display: flex; align-items: end;"><button onclick="saveGoogleScriptUrl()" style="width:100%; padding:10px; background:#8e44ad; color:#fff; border:none; border-radius:8px; cursor:pointer;">حفظ الرابط</button></div>
+                        <div style="display: flex; align-items: end;"><button onclick="downloadUpdatedHtml()" style="width:100%; padding:10px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer;">حفظ وتنزيل نسخة للمستخدمين</button></div>
+                    </div>
+                    <p style="font-size: 11px; color: #666; margin-top: 8px;">ملاحظة: سيتم إرسال كل استمارة جديدة تُحفظ تلقائياً إلى ملف جوجل شيت المرتبط بهذا الرابط. استخدم زر "حفظ وتنزيل نسخة للمستخدمين" للحصول على ملف <code>index.html</code> جاهز ومعد لديهم مباشرة.</p>
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;">
+                    <h3 style="color:#c0392b; font-size:16px;">جدول حسابات المستخدمين</h3>
+                    <button class="export-btn excel" onclick="exportUsersExcel()" style="background:#27ae60; font-weight:bold;">📥 حفظ جدول المستخدمين كملف Excel</button>
+                </div>
+                <div class="reports-table-wrapper">
+                    <table class="reports-table admin-table">
+                        <thead><tr><th>#</th><th>المستخدم</th><th>كلمة المرور</th><th>الصلاحية</th><th>تاريخ الإضافة</th><th>أُضيف بواسطة</th><th>الإجراءات</th></tr></thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <!-- نافذة منبثقة لتعديل بيانات النشاط -->
+    <div id="editActivityModal" class="modal-overlay" onclick="handleModalOverlayClick(event)">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3><span>✏️</span> تعديل معلومات النشاط المدخل</h3>
+                <button type="button" class="modal-close-btn" onclick="closeEditActivityModal()" title="إغلاق">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editRecordId">
+                <input type="hidden" id="editActIndex">
+                
+                <div style="background: #f8f9fa; border-right: 4px solid #1e3c72; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong style="color: #1e3c72; font-size: 13px;">🏢 بيانات الاستمارة والسجل</strong>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px;">
+                    <div>
+                        <label>الموظف المسؤول <span class="required-star">*</span></label>
+                        <select id="editRecEmployee"></select>
+                    </div>
+                    <div>
+                        <label>مكان العمل / الشعبة <span class="required-star">*</span></label>
+                        <select id="editRecWorkplace"></select>
+                    </div>
+                    <div>
+                        <label>الشهر <span class="required-star">*</span></label>
+                        <select id="editRecMonth">
+                            <option value="يناير">يناير</option>
+                            <option value="فبراير">فبراير</option>
+                            <option value="مارس">مارس</option>
+                            <option value="أبريل">أبريل</option>
+                            <option value="مايو">مايو</option>
+                            <option value="يونيو">يونيو</option>
+                            <option value="يوليو">يوليو</option>
+                            <option value="أغسطس">أغسطس</option>
+                            <option value="سبتمبر">سبتمبر</option>
+                            <option value="أكتوبر">أكتوبر</option>
+                            <option value="نوفمبر">نوفمبر</option>
+                            <option value="ديسمبر">ديسمبر</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>السنة <span class="required-star">*</span></label>
+                        <select id="editRecYear">
+                            <option value="2026">2026</option>
+                            <option value="2027">2027</option>
+                            <option value="2028">2028</option>
+                            <option value="2029">2029</option>
+                            <option value="2030">2030</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="background: #f8f9fa; border-right: 4px solid #8e44ad; padding: 10px 14px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong style="color: #8e44ad; font-size: 13px;">📝 تفاصيل النشاط المدخل</strong>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px;">
+                    <div style="grid-column: span 2;">
+                        <label>اسم النشاط <span class="required-star">*</span></label>
+                        <input type="text" id="editActName" placeholder="اسم النشاط">
+                    </div>
+                    <div>
+                        <label>عدد المشتركين</label>
+                        <input type="number" id="editActParticipants" min="0" placeholder="0">
+                    </div>
+                    <div>
+                        <label>تاريخ النشاط</label>
+                        <input type="date" id="editActDate">
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px;">
+                    <div>
+                        <label>جهة التنفيذ</label>
+                        <input type="text" id="editActExecutor" placeholder="جهة التنفيذ">
+                    </div>
+                    <div>
+                        <label>الجهة المستهدفة</label>
+                        <input type="text" id="editActTarget" placeholder="الجهة المستهدفة">
+                    </div>
+                    <div style="grid-column: span 2;">
+                        <label>المرفقات</label>
+                        <input type="text" id="editActAttachments" placeholder="المرفقات">
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom: 15px; grid-template-columns: 1fr 1fr;">
+                    <div>
+                        <label>تفاصيل النشاط</label>
+                        <textarea id="editActDetails" rows="3" style="width:100%; padding:10px; border:2px solid #1e3c72; border-radius:8px; font-size:13px; resize:vertical;" placeholder="تفاصيل النشاط..."></textarea>
+                    </div>
+                    <div>
+                        <label>الملاحظات</label>
+                        <textarea id="editActNotes" rows="3" style="width:100%; padding:10px; border:2px solid #1e3c72; border-radius:8px; font-size:13px; resize:vertical;" placeholder="الملاحظات..."></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="closeEditActivityModal()" style="padding: 9px 20px; background: #95a5a6; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold;">إلغاء</button>
+                <button type="button" id="saveEditActBtn" onclick="saveEditedActivity()" style="padding: 9px 22px; background: #27ae60; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 6px;">💾 حفظ التعديلات</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="app-footer">
+        <div class="footer-content">
+            <div class="footer-title">برمجة وتصميم</div>
+            <div class="footer-name">م.م صفاء هادي عبد العالي</div>
+            <div class="footer-position">مدير قسم الاعداد والتدريب</div>
+            <div class="footer-divider"></div>
+            <div class="footer-copyright">© 2026 - جميع الحقوق محفوظة - مديرية تربية المثنى - وزارة التربية</div>
+        </div>
+    </footer>
+
+    <script>
+        function initializeDefaultUsers() {
+            let users = {};
+            try {
+                users = JSON.parse(localStorage.getItem('systemUsers') || '{}');
+            } catch (e) {
+                users = {};
+            }
+
+            const defaultUsers = {
+                'admin': { password: 'SA@@2026##ra', role: 'admin', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'user': { password: 'user@159', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'hossin.f': { password: 'hos@789', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'ali.sabah': { password: 'bohuth123', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'baneen': { password: 'baneen#753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'hamza.j': { password: 'hamza@159', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'staar.a': { password: 'sataar753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' },
+                'drgham': { password: 'drgham@@753', role: 'user', createdAt: new Date().toISOString(), createdBy: 'system' }
+            };
+
+            // تنظيف الحسابات المعكوسة القديمة
+            const badKeys = ['user@159', 'hos@789', 'bohuth123', 'baneen#753', 'hamza@159', 'sataar753', 'drgham@@753'];
+            badKeys.forEach(k => {
+                if (users[k] && users[k].createdBy === 'system') {
+                    delete users[k];
+                }
+            });
+
+            let updated = true; // Force save to persist cleanup
+            for (let key in defaultUsers) {
+                // فقط أضف المستخدم إذا لم يكن موجوداً أصلاً - لا تُعد كتابة التغييرات التي أجراها الأدمن
+                if (!users[key]) {
+                    users[key] = defaultUsers[key];
+                    updated = true;
+                }
+            }
+
+            if (updated || !localStorage.getItem('systemUsers')) {
+                localStorage.setItem('systemUsers', JSON.stringify(users));
+            }
+        }
+        // ترحيل لمرة واحدة: مسح بيانات المستخدمين القديمة التي كانت تُعاد كتابتها في كل تحميل
+        if (!localStorage.getItem('usersFixApplied_v2')) {
+            localStorage.removeItem('systemUsers');
+            localStorage.setItem('usersFixApplied_v2', 'true');
+        }
+        initializeDefaultUsers();
+
+        function getUsers() { return JSON.parse(localStorage.getItem('systemUsers') || '{}'); }
+        function saveUsers(users) { localStorage.setItem('systemUsers', JSON.stringify(users)); }
+
+        function authenticateUser(u, p) {
+            const users = getUsers();
+            if (!users[u]) return { success: false, message: 'اسم المستخدم غير موجود' };
+            if (users[u].password !== p) return { success: false, message: 'كلمة المرور غير صحيحة' };
+            return { success: true, user: u, role: users[u].role };
+        }
+
+        let currentUser = '', currentUserRole = '', rowCount = 0;
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+            if (!u || !p) {
+                document.getElementById('errorMsg').textContent = 'الرجاء إدخال اسم المستخدم وكلمة المرور';
+                document.getElementById('errorMsg').style.display = 'block';
+                return;
+            }
+            const r = authenticateUser(u, p);
+            if (r.success) {
+                currentUser = r.user; currentUserRole = r.role;
+                localStorage.setItem('currentUser', currentUser);
+                localStorage.setItem('currentUserRole', currentUserRole);
+                document.getElementById('userDisplay').textContent = currentUser;
+                document.getElementById('errorMsg').style.display = 'none';
+                if (currentUserRole === 'admin') {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="admin-badge">أدمن</span>';
+                    document.getElementById('navAdminBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="role-badge user">مستخدم</span>';
+                    document.getElementById('navAdminBtn').style.display = 'none';
+                }
+                document.getElementById('mainNavbar').classList.add('show');
+                showPage('formPage');
+                if (rowCount === 0) addRow();
+                loadReports();
+                showNotification('مرحباً ' + currentUser, 'success');
+            } else {
+                document.getElementById('errorMsg').textContent = r.message;
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        });
+
+        function showPage(pageId) {
+            if (pageId === 'adminPage' || pageId === 'reportsPage' || pageId === 'cumulativePage') {
+                if (currentUserRole !== 'admin') { showNotification('ليس لديك صلاحية!', 'error'); return; }
+            }
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            ['navFormBtn', 'navReportsBtn', 'navCumulativeBtn', 'navAdminBtn'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('active');
+            });
+            if (pageId === 'formPage') { document.getElementById('navFormBtn').classList.add('active'); updateUserNotice(); }
+            else if (pageId === 'reportsPage') { document.getElementById('navReportsBtn').classList.add('active'); loadReports(); }
+            else if (pageId === 'cumulativePage') { document.getElementById('navCumulativeBtn').classList.add('active'); setTimeout(() => loadCumulativeReport(), 50); }
+            else if (pageId === 'adminPage') { document.getElementById('navAdminBtn').classList.add('active'); loadUsers(); }
+        }
+
+        function updateUserNotice() {
+            const el = document.getElementById('userNotice');
+            if (el) el.style.display = (currentUserRole === 'user') ? 'block' : 'none';
+        }
+
+        function logout() {
+            if (confirm('هل تريد تسجيل الخروج من النظام؟')) {
+                currentUser = ''; currentUserRole = '';
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('currentUserRole');
+                document.getElementById('mainNavbar').classList.remove('show');
+                document.getElementById('navAdminBtn').style.display = 'none';
+                showPage('loginPage');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                clearForm();
+            }
+        }
+
+        function loadUsers() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            loadGoogleScriptUrl();
+            const users = getUsers();
+            const tbody = document.getElementById('usersTableBody');
+            let admins = 0, normals = 0;
+            const arr = Object.keys(users).map(u => ({ username: u, ...users[u] }));
+            arr.forEach(u => u.role === 'admin' ? admins++ : normals++);
+            document.getElementById('totalUsers').textContent = arr.length;
+            document.getElementById('totalAdmins').textContent = admins;
+            document.getElementById('totalNormalUsers').textContent = normals;
+            tbody.innerHTML = '';
+            arr.forEach((user, i) => {
+                const isMe = user.username === currentUser;
+                const isSys = user.createdBy === 'system';
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td><strong>' + user.username + '</strong> ' + (isMe ? '<span style="color:#27ae60;">(أنت)</span>' : '') + '</td>' +
+                    '<td><code style="background:#f1f2f6; padding:3px 6px; border-radius:4px; font-family:monospace; font-size:12px; color:#c0392b;">' + user.password + '</code></td>' +
+                    '<td><span style="background:' + (user.role === 'admin' ? '#c0392b' : '#27ae60') + '; color:#fff; padding:3px 8px; border-radius:10px; font-size:10px;">' + (user.role === 'admin' ? 'أدمن' : 'مستخدم') + '</span></td>' +
+                    '<td>' + new Date(user.createdAt).toLocaleDateString('ar-IQ') + '</td>' +
+                    '<td>' + (user.createdBy || '-') + '</td>' +
+                    '<td>' +
+                        '<button class="btn-edit" onclick="changePassword(\'' + user.username + '\')">تغيير كلمة المرور</button> ' +
+                        (user.username !== 'admin' ? '<button class="' + (user.role === 'admin' ? 'btn-role-user' : 'btn-role-admin') + '" onclick="toggleUserRole(\'' + user.username + '\')">' + (user.role === 'admin' ? 'تحويل لمستخدم' : 'تحويل لأدمن') + '</button> ' : '') +
+                        (!isSys && user.username !== 'admin' ? '<button class="btn-delete" onclick="deleteUser(\'' + user.username + '\')">حذف</button>' : '') +
+                    '</td>' +
+                '</tr>';
+            });
+        }
+
+        function generateCredentials() {
+            const usernames = ['user', 'admin', 'editor', 'member', 'training', 'research', 'art', 'office'];
+            const randomUser = usernames[Math.floor(Math.random() * usernames.length)] + '@' + Math.floor(100 + Math.random() * 900);
+            
+            const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
+            let randomPass = '';
+            for (let i = 0; i < 10; i++) {
+                randomPass += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            
+            document.getElementById('newUsername').value = randomUser;
+            document.getElementById('newPassword').value = randomPass;
+            showNotification('تم توليد اسم مستخدم وكلمة مرور عشوائية', 'info');
+        }
+
+        function syncUserWithGoogleSheets(userData) {
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'ضع_رابط_جوجل_شيت_هنا') return;
+
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(userData)
+            })
+            .catch(err => {
+                console.error('Error syncing user with Google Sheets:', err);
+                showNotification('خطأ في مزامنة الحساب مع جوجل شيت', 'error');
+            });
+        }
+
+        function addNewUser() {
+            if (currentUserRole !== 'admin') return;
+            const u = document.getElementById('newUsername').value.trim();
+            const p = document.getElementById('newPassword').value.trim();
+            const r = document.getElementById('newUserRole').value;
+            if (!u || !p) { showNotification('املأ الحقول!', 'error'); return; }
+            if (u.length < 3 || p.length < 4) { showNotification('القيم قصيرة جداً!', 'error'); return; }
+            
+            const users = getUsers();
+            if (users[u]) { showNotification('المستخدم موجود مسبقاً!', 'error'); return; }
+            users[u] = { password: p, role: r, createdAt: new Date().toISOString(), createdBy: currentUser };
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'saveUser', username: u, password: p, role: r, createdBy: currentUser });
+
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            loadUsers();
+            showNotification('تم إضافة "' + u + '" ومزامنته', 'success');
+        }
+
+        function deleteUser(u) {
+            if (u === 'admin' || u === currentUser) { showNotification('لا يمكن الحذف!', 'error'); return; }
+            if (!confirm('حذف "' + u + '"؟')) return;
+            
+            const users = getUsers();
+            delete users[u];
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'deleteUser', username: u });
+
+            loadUsers();
+            showNotification('تم الحذف ومزامنة التغيير', 'success');
+        }
+
+        function toggleUserRole(u) {
+            if (u === 'admin') return;
+            const users = getUsers();
+            users[u].role = users[u].role === 'admin' ? 'user' : 'admin';
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'saveUser', username: u, password: users[u].password, role: users[u].role, createdBy: users[u].createdBy });
+
+            loadUsers();
+            showNotification('تم تغيير الصلاحية ومزامنتها', 'success');
+        }
+
+        function changePassword(u) {
+            const p = prompt('كلمة مرور جديدة لـ "' + u + '":');
+            if (!p || p.length < 4) { showNotification('كلمة المرور قصيرة!', 'error'); return; }
+            
+            const users = getUsers();
+            users[u].password = p;
+            saveUsers(users);
+
+            // مزامنة مع جوجل شيت
+            syncUserWithGoogleSheets({ action: 'saveUser', username: u, password: p, role: users[u].role, createdBy: users[u].createdBy });
+
+            showNotification('تم تغيير كلمة المرور ومزامنتها', 'success');
+            loadUsers(); // تحديث الجدول فوراً
+        }
+
+        function addRow() {
+            rowCount++;
+            const tbody = document.getElementById('tableBody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = '<td>' + rowCount + '</td>' +
+                '<td><input type="text" placeholder="اسم النشاط" class="activity-name"></td>' +
+                '<td><textarea placeholder="التفاصيل" class="activity-details"></textarea></td>' +
+                '<td><input type="number" min="0" placeholder="0" class="participants"></td>' +
+                '<td><input type="text" placeholder="جهة التنفيذ" class="executor"></td>' +
+                '<td><input type="text" placeholder="الجهة المستهدفة" class="target"></td>' +
+                '<td><input type="text" placeholder="المرفقات" class="attachments"></td>' +
+                '<td><input type="date" class="activity-date"></td>' +
+                '<td><textarea placeholder="الملاحظات" class="notes"></textarea></td>' +
+                '<td><button class="delete-btn" onclick="deleteRow(this)">حذف</button></td>';
+            tbody.appendChild(tr);
+        }
+
+        function deleteRow(btn) { if (confirm('حذف هذا النشاط؟')) btn.closest('tr').remove(); }
+
+        function getFormData() {
+            const m = document.getElementById('month').value;
+            const y = document.getElementById('year').value;
+            const e = document.getElementById('employee').value;
+            const w = document.getElementById('workplace').value;
+            const acts = [];
+            document.querySelectorAll('#tableBody tr').forEach((row, i) => {
+                const name = row.querySelector('.activity-name').value;
+                if (name && name.trim()) {
+                    acts.push({
+                        t: i + 1, name: name.trim(),
+                        details: row.querySelector('.activity-details').value,
+                        participants: parseInt(row.querySelector('.participants').value) || 0,
+                        executor: row.querySelector('.executor').value,
+                        target: row.querySelector('.target').value,
+                        attachments: row.querySelector('.attachments').value,
+                        date: row.querySelector('.activity-date').value,
+                        notes: row.querySelector('.notes').value
+                    });
+                }
+            });
+            return { m, y, e, w, acts };
+        }
+
+        async function saveForm() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ جميع الحقول المطلوبة!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+            
+            showNotification('جاري المزامنة والتحقق من السجلات السابقة...', 'info');
+            
+            // جلب أحدث البيانات من جوجل شيت لضمان التراكم الصحيح عبر جميع المستخدمين
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true); // جلب مباشر مع تفريغ الكاش
+            } catch (e) {
+                console.error("Failed to fetch latest records, using local storage", e);
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+            
+            const now = new Date();
+            const idx = records.findIndex(r => r.month === data.m && r.year === data.y && r.employee === data.e && r.workplace === data.w);
+            let finalRecord;
+            if (idx !== -1) {
+                finalRecord = records[idx];
+                const currentLength = finalRecord.activities ? finalRecord.activities.length : 0;
+                // التأكد من أن الترقيم تتابعي للأنشطة الجديدة المضافة
+                const newActs = data.acts.map((a, i) => ({ ...a, t: currentLength + i + 1 }));
+                finalRecord.activities = (finalRecord.activities || []).concat(newActs);
+                finalRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                finalRecord.updatedBy = currentUser;
+                finalRecord.timestamp = now.getTime();
+                
+                // تحديث السجلات محلياً
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                showNotification('تمت إضافة الأنشطة تراكمياً بنجاح: ' + data.acts.length + ' نشاط جديد', 'success');
+            } else {
+                finalRecord = {
+                    id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                    timestamp: now.getTime(), date: now.toLocaleString('ar-IQ'),
+                    month: data.m, year: data.y, employee: data.e, workplace: data.w,
+                    activities: data.acts, savedBy: currentUser,
+                    expiryDate: now.getTime() + (31 * 24 * 60 * 60 * 1000)
+                };
+                records.push(finalRecord);
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                showNotification('تم حفظ الاستمارة الجديدة بنجاح', 'success');
+            }
+            
+            // مزامنة البيانات تلقائياً مع جوجل شيت إذا كان الرابط مهيأً
+            sendToGoogleSheets(finalRecord);
+            
+            // تحديث شاشة التقارير
+            loadReports(true);
+            
+            // تفريغ الجدول لتجنب التكرار في الحفظ القادم
+            clearTableOnly();
+        }
+
+        function clearTableOnly() {
+            document.getElementById('tableBody').innerHTML = '';
+            rowCount = 0;
+            addRow();
+        }
+
+        // ضع رابط Google Apps Script الخاص بك هنا بين علامتي الاقتباس ليكون افتراضياً للجميع
+        const DEFAULT_GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxtoXgqEXS3aKJDryV_rn7NV7Meraa0lhTKHHts5GLHh7aUYulR9pAbxWhESe1zTSjk/exec';
+
+        // إرسال البيانات إلى Google Sheets عبر Apps Script Web App
+        function sendToGoogleSheets(recordData) {
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'ضع_رابط_جوجل_شيت_هنا') return; // غير مهيأ
+
+            showNotification('جاري مزامنة الاستمارة مع جوجل شيت...', 'info');
+
+            // نستخدم mode: 'no-cors' لأن جوجل يقوم بإعادة توجيه الطلب (Redirect 302) مما يسبب خطأ CORS في المتصفح رغم وصول البيانات.
+            fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: JSON.stringify(recordData)
+            })
+            .then(() => {
+                // مع no-cors ستكون الاستجابة opaque والوصول ناجح دائماً لجوجل شيت
+                showNotification('تمت المزامنة مع جوجل شيت بنجاح', 'success');
+            })
+            .catch(err => {
+                console.error('Error syncing with Google Sheets:', err);
+                showNotification('حدث خطأ أثناء الاتصال بجوجل شيت', 'error');
+            });
+        }
+
+        // جلب البيانات من Google Sheets
+        let isFetchingSheets = false;
+        async function fetchFromGoogleSheets(force = false) {
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (!scriptUrl || scriptUrl === 'ضع_رابط_جوجل_شيت_هنا') {
+                return JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const cacheKey = 'sheets_data_cache';
+            const cacheTimeKey = 'sheets_data_cache_time';
+            const cachedData = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(cacheTimeKey);
+            const now = Date.now();
+
+            // استخدام الكاش إذا كان صالحاً (30 ثانية) ولم يتم طلب التحديث الإجباري
+            if (!force && cachedData && cachedTime && (now - parseInt(cachedTime) < 30000)) {
+                return JSON.parse(cachedData);
+            }
+
+            if (isFetchingSheets) {
+                return cachedData ? JSON.parse(cachedData) : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            isFetchingSheets = true;
+            try {
+                const response = await fetch(scriptUrl);
+                if (!response.ok) throw new Error('Response error');
+                const data = await response.json();
+                
+                // التوافق مع الهيكل الجديد (كائن يحتوي على السجلات والمستخدمين)
+                if (data && data.records && data.users) {
+                    // حفظ المستخدمين المزامنين من جوجل شيت
+                    localStorage.setItem('systemUsers', JSON.stringify(data.users));
+                    
+                    localStorage.setItem(cacheKey, JSON.stringify(data.records));
+                    localStorage.setItem(cacheTimeKey, now.toString());
+                    
+                    let localRecords = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+                    let merged = mergeRecords(localRecords, data.records);
+                    localStorage.setItem('sharedRecords', JSON.stringify(merged));
+                    
+                    isFetchingSheets = false;
+                    return merged;
+                }
+                // التوافق التراجعي مع الهيكل القديم (إذا لم يتم تحديث Apps Script بعد)
+                else if (Array.isArray(data)) {
+                    localStorage.setItem(cacheKey, JSON.stringify(data));
+                    localStorage.setItem(cacheTimeKey, now.toString());
+                    
+                    let localRecords = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+                    let merged = mergeRecords(localRecords, data);
+                    localStorage.setItem('sharedRecords', JSON.stringify(merged));
+                    
+                    isFetchingSheets = false;
+                    return merged;
+                }
+            } catch (err) {
+                console.error('Error fetching from Google Sheets:', err);
+                isFetchingSheets = false;
+                return JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+            isFetchingSheets = false;
+            return JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+        }
+
+        // دمج السجلات المحلية مع سجلات جوجل شيت لمنع التكرار وترتيبها بالوقت
+        function mergeRecords(local, remote) {
+            const map = {};
+            remote.forEach(r => { if (r.id) map[r.id] = r; });
+            local.forEach(r => { 
+                if (r.id) {
+                    if (!map[r.id] || (r.timestamp || 0) >= (map[r.id].timestamp || 0)) {
+                        map[r.id] = r; 
+                    }
+                }
+            });
+            return Object.values(map).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+        }
+
+        function saveGoogleScriptUrl() {
+            const url = document.getElementById('googleScriptUrl').value.trim();
+            localStorage.setItem('googleScriptUrl', url);
+            showNotification('تم حفظ رابط جوجل شيت بنجاح', 'success');
+        }
+
+        function downloadUpdatedHtml() {
+            const url = document.getElementById('googleScriptUrl').value.trim();
+            if (!url) {
+                showNotification('يرجى إدخال رابط جوجل شيت أولاً!', 'error');
+                return;
+            }
+            
+            // حفظ الرابط محلياً أولاً
+            localStorage.setItem('googleScriptUrl', url);
+            
+            // دالة مساعدة لتنزيل الملف
+            function triggerDownload(htmlContent) {
+                const regex = /const DEFAULT_GOOGLE_SCRIPT_URL = '.*?';/;
+                let updatedHtml = htmlContent.replace(regex, `const DEFAULT_GOOGLE_SCRIPT_URL = '${url}';`);
+                
+                const blob = new Blob(['\ufeff' + updatedHtml], { type: 'text/html;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'index.html';
+                link.click();
+                showNotification('تم حفظ الرابط وتنزيل ملف index.html المحدث. يرجى توزيعه على المستخدمين.', 'success');
+            }
+            
+            showNotification('جاري توليد ملف التحديث للمستخدمين...', 'info');
+            
+            // محاولة جلب كود الملف الأصلي عبر fetch
+            fetch(window.location.href)
+            .then(res => {
+                if (!res.ok) throw new Error('CORS or network error');
+                return res.text();
+            })
+            .then(html => {
+                triggerDownload(html);
+            })
+            .catch(err => {
+                console.warn('Fetch failed, falling back to outerHTML:', err);
+                // في حال الفشل (مثل قيود CORS للملفات المحلية file://) نستخدم outerHTML كبديل
+                const docHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+                triggerDownload(docHtml);
+            });
+        }
+
+        function loadGoogleScriptUrl() {
+            let url = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (url === 'ضع_رابط_جوجل_شيت_هنا') url = '';
+            const el = document.getElementById('googleScriptUrl');
+            if (el) el.value = url;
+        }
+
+        function clearForm() {
+            if (confirm('مسح جميع البيانات؟')) {
+                document.getElementById('month').value = '';
+                document.getElementById('year').value = '';
+                document.getElementById('employee').value = '';
+                document.getElementById('workplace').value = '';
+                document.getElementById('tableBody').innerHTML = '';
+                rowCount = 0;
+                addRow();
+            }
+        }
+
+        // ✅✅✅ تصدير Word - نظيف A4 مع 2 توقيع ✅✅✅
+        function exportWord() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ البيانات أولاً!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+
+            const totalParticipants = data.acts.reduce((sum, a) => sum + (parseInt(a.participants) || 0), 0);
+            const today = new Date();
+            const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+            let rowsHtml = '';
+            data.acts.forEach((a, i) => {
+                rowsHtml += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + (a.name || '') + '</td>' +
+                    '<td>' + (a.details || '') + '</td>' +
+                    '<td>' + (a.participants || '') + '</td>' +
+                    '<td>' + (a.executor || '') + '</td>' +
+                    '<td>' + (a.target || '') + '</td>' +
+                    '<td>' + (a.attachments || '') + '</td>' +
+                    '<td>' + (a.date || '') + '</td>' +
+                    '<td>' + (a.notes || '') + '</td>' +
+                '</tr>';
+            });
+
+            const content = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="UTF-8">' +
+                '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->' +
+                '<style>' +
+                '@page { size: A4; margin: 1.2cm 1cm; }' +
+                'body { font-family: "Arial", "Tahoma", sans-serif; direction: rtl; font-size: 11pt; margin: 0; padding: 0; color: #000; background: #fff; }' +
+                '* { box-sizing: border-box; }' +
+                '.doc { padding: 6px; }' +
+
+                // الترويسة
+                '.header { padding-bottom: 6px; margin-bottom: 5px; }' +
+                '.header table { width: 100%; border-collapse: collapse; }' +
+                '.header td { vertical-align: middle; padding: 2px; }' +
+                '.header .right { text-align: right; width: 38%; font-size: 11pt; font-weight: bold; }' +
+                '.header .center { text-align: center; width: 24%; }' +
+                '.header .left { text-align: left; width: 38%; font-size: 11pt; font-weight: bold; }' +
+                '.header h1 { margin: 0; font-size: 12pt; color: #000; line-height: 1.4; }' +
+                '.header h2 { margin: 0; font-size: 11pt; color: #000; line-height: 1.4; font-weight: normal; }' +
+                '.logo { width: 70px; height: 70px; object-fit: contain; }' +
+
+                // سطر العدد والتاريخ
+                '.meta-row { width: 100%; margin-bottom: 15px; }' +
+                '.meta-table { width: 100%; border-collapse: collapse; }' +
+                '.meta-table td { border: none !important; font-size: 11pt; font-weight: bold; padding: 4px 0; }' +
+
+                // المعلومات
+                '.info { margin-bottom: 10px; }' +
+                '.info table { width: 100%; border-collapse: collapse; }' +
+                '.info td { border: 1px solid #000; padding: 5px 8px; font-size: 11pt; }' +
+                '.info .lbl { background: #e8e8e8; text-align: center; font-weight: bold; }' +
+                '.info .val { text-align: center; }' +
+
+                // الجدول
+                '.main-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }' +
+                '.main-table th { background: #d9d9d9; border: 1px solid #000; padding: 6px 3px; font-size: 10pt; text-align: center; font-weight: bold; }' +
+                '.main-table td { border: 1px solid #000; padding: 5px 3px; font-size: 10pt; text-align: center; vertical-align: middle; }' +
+
+                // التوقيعات
+                '.signatures { margin-top: 80px; padding: 0 5px; }' +
+                '.sig-table { width: 100%; border-collapse: collapse; }' +
+                '.sig-table td { width: 50%; text-align: center; padding: 5px; vertical-align: top; border: none; }' +
+                '.sig-lbl { font-size: 11pt; margin-bottom: 15px; font-weight: bold; }' +
+                '.sig-role { font-size: 11pt; margin-top: 15px; font-weight: bold; }' +
+                '.sig-name { font-size: 11pt; margin-top: 5px; font-weight: bold; }' +
+
+                '</style></head><body>' +
+                '<div class="doc">' +
+
+                // الترويسة مع اللوغو في المنتصف
+                '<div class="header">' +
+                    '<table>' +
+                        '<tr>' +
+                            '<td class="right">' +
+                                '<h1>وزارة التربية</h1>' +
+                                '<h2>المديرية العامة لتربية المثنى</h2>' +
+                            '</td>' +
+                            '<td class="center">' +
+                                '<img class="logo" src="logo1.png" alt="اللوغو" />' +
+                            '</td>' +
+                            '<td class="left">' +
+                                '<h1>قسم الاعداد والتدريب</h1>' +
+                                '<h2>استمارة النشاطات الشهرية</h2>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                // سطر العدد والتاريخ
+                '<div class="meta-row">' +
+                    '<table class="meta-table">' +
+                        '<tr>' +
+                            '<td style="text-align: right; width: 50%;">العدد:</td>' +
+                            '<td style="text-align: left; width: 50%;">التاريخ: &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;' + data.y + '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                // المعلومات
+                '<div class="info">' +
+                    '<table>' +
+                        '<tr>' +
+                            '<td class="lbl" style="width:12%;">الشهر</td>' +
+                            '<td class="val" style="width:21%;">' + data.m + '</td>' +
+                            '<td class="lbl" style="width:12%;">السنة</td>' +
+                            '<td class="val" style="width:21%;">' + data.y + '</td>' +
+                            '<td class="lbl" style="width:12%;">العدد</td>' +
+                            '<td class="val">' + data.acts.length + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td class="lbl">الموظف</td>' +
+                            '<td colspan="3">' + data.e + '</td>' +
+                            '<td class="lbl">مكان العمل</td>' +
+                            '<td>' + data.w + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td class="lbl">تاريخ الإصدار</td>' +
+                            '<td class="val">' + todayStr + '</td>' +
+                            '<td class="lbl">إجمالي المشتركين</td>' +
+                            '<td class="val">' + totalParticipants + '</td>' +
+                            '<td class="lbl">مجموع النشاطات</td>' +
+                            '<td class="val">' + data.acts.length + '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                // الجدول
+                '<table class="main-table">' +
+                    '<thead>' +
+                        '<tr>' +
+                            '<th style="width:4%;">ت</th>' +
+                            '<th style="width:14%;">النشاط</th>' +
+                            '<th style="width:14%;">التفاصيل</th>' +
+                            '<th style="width:7%;">المشتركين</th>' +
+                            '<th style="width:12%;">جهة التنفيذ</th>' +
+                            '<th style="width:12%;">الجهة المستهدفة</th>' +
+                            '<th style="width:10%;">المرفقات</th>' +
+                            '<th style="width:10%;">التاريخ</th>' +
+                            '<th style="width:17%;">الملاحظات</th>' +
+                        '</tr>' +
+                    '</thead>' +
+                    '<tbody>' + rowsHtml + '</tbody>' +
+                '</table>' +
+
+                // التوقيعات - بدون خطوط
+                '<div class="signatures">' +
+                    '<table class="sig-table">' +
+                        '<tr>' +
+                            '<td>' +
+                                '<div class="sig-lbl">التوقيع :</div>' +
+                                '<div class="sig-role">مسؤول الشعبة</div>' +
+                            '</td>' +
+                            '<td>' +
+                                '<div class="sig-lbl">التوقيع :</div>' +
+                                '<div class="sig-role">مدير القسم</div>' +
+                                '<div class="sig-name">م.م صفاء هادي عبد العالي</div>' +
+                            '</td>' +
+                        '</tr>' +
+                    '</table>' +
+                '</div>' +
+
+                '</div>' +
+                '</body></html>';
+
+            const blob = new Blob(['\ufeff' + content], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'استمارة_' + data.m + '_' + data.y + '_' + data.acts.length + 'نشاط.doc';
+            link.click();
+            showNotification('تم تصدير الاستمارة بنجاح', 'success');
+        }
+
+        function exportFormExcel() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ البيانات أولاً!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+            const totalParticipants = data.acts.reduce((sum, a) => sum + (parseInt(a.participants) || 0), 0);
+            const today = new Date();
+            const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+
+            let rows = '';
+            data.acts.forEach((a, i) => {
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(a.details) + '</td>' +
+                    '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                    '<td>' + escapeHtml(a.executor) + '</td>' +
+                    '<td>' + escapeHtml(a.target) + '</td>' +
+                    '<td>' + escapeHtml(a.attachments) + '</td>' +
+                    '<td>' + escapeHtml(a.date) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(a.notes) + '</td>' +
+                '</tr>';
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="9" class="main-title">وزارة التربية - المديرية العامة لتربية المثنى</th></tr>' +
+                    '<tr><th colspan="9" class="sub-title">قسم الاعداد والتدريب - استمارة النشاطات الشهرية</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">الشهر</th><td class="stat-val">' + escapeHtml(data.m) + '</td>' +
+                        '<th class="stat-lbl">السنة</th><td class="stat-val">' + escapeHtml(data.y) + '</td>' +
+                        '<th class="stat-lbl">الموظف</th><td class="stat-val" colspan="4">' + escapeHtml(data.e) + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">مكان العمل</th><td class="stat-val" colspan="3">' + escapeHtml(data.w) + '</td>' +
+                        '<th class="stat-lbl">تاريخ الإصدار</th><td class="stat-val">' + todayStr + '</td>' +
+                        '<th class="stat-lbl">إجمالي المشتركين</th><td class="stat-val num" colspan="2">' + totalParticipants + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:90px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'استمارة_' + data.m + '_' + data.y + '.xls');
+        }
+
+        async function loadReports(forceRefresh = false) {
+            const tbody = document.getElementById('reportsTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">جاري جلب البيانات من جوجل شيت...</td></tr>';
+            
+            const records = await fetchFromGoogleSheets(forceRefresh);
+            document.getElementById('totalRecords').textContent = records.length;
+            
+            // حساب الإحصائيات (نشطة، قارب الانتهاء، منتهية)
+            const nowTime = Date.now();
+            let active = 0, soon = 0, expired = 0;
+            records.forEach(r => {
+                const expiry = r.expiryDate || (r.timestamp + 31 * 24 * 60 * 60 * 1000);
+                if (nowTime > expiry) {
+                    expired++;
+                } else if (expiry - nowTime < 7 * 24 * 60 * 60 * 1000) {
+                    soon++;
+                } else {
+                    active++;
+                }
+            });
+            document.getElementById('activeRecords').textContent = active;
+            document.getElementById('expiringSoon').textContent = soon;
+            document.getElementById('expiredRecords').textContent = expired;
+
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">لا توجد سجلات</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            // ترتيب تنازلي حسب وقت الحفظ
+            const sortedRecords = records.slice().sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            sortedRecords.forEach((r, i) => {
+                tbody.innerHTML += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td>' + r.date + '</td>' +
+                    '<td><strong>' + r.employee + '</strong></td>' +
+                    '<td>' + r.workplace + '</td>' +
+                    '<td>' + r.month + ' ' + r.year + '</td>' +
+                    '<td>' + (r.activities ? r.activities.length : 0) + '</td>' +
+                    '<td><button class="btn-delete" onclick="deleteRecord(\'' + r.id + '\')" title="مسح السجل">🗑️ حذف</button></td>' +
+                '</tr>';
+            });
+        }
+
+        function deleteRecord(id) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            if (!confirm('حذف هذا السجل؟')) return;
+            
+            // حذف محلي أولاً
+            let records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem('sharedRecords', JSON.stringify(records));
+            
+            // حذف من جوجل شيت
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                showNotification('جاري حذف السجل من جوجل شيت...', 'info');
+                fetch(scriptUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ action: 'delete', id: id })
+                })
+                .then(() => {
+                    showNotification('تم الحذف من جوجل شيت بنجاح', 'success');
+                    loadReports(true); // جلب البيانات المحدثة
+                })
+                .catch(err => {
+                    console.error('Error deleting from Google Sheets:', err);
+                    showNotification('حدث خطأ أثناء الحذف من جوجل شيت', 'error');
+                    loadReports();
+                });
+            } else {
+                loadReports();
+            }
+        }
+
+        async function deleteActivityFromAllRecords(activityName) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            if (!confirm('هل أنت متأكد من حذف هذا النشاط ("' + activityName + '") من جميع السجلات؟ هذا الإجراء سيقوم بإزالة هذا النشاط وتحديث السجلات المرتبطة به.')) return;
+            
+            showNotification('جاري حذف النشاط...', 'info');
+            
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+            
+            let updatedRecords = [];
+            let changed = false;
+            const now = new Date();
+            let changedRecords = [];
+            
+            records.forEach(r => {
+                if (r.activities) {
+                    const originalLength = r.activities.length;
+                    r.activities = r.activities.filter(act => (act.name || '').trim() !== activityName.trim());
+                    if (r.activities.length !== originalLength) {
+                        changed = true;
+                        r.timestamp = now.getTime();
+                        r.lastUpdated = now.toLocaleString('ar-IQ');
+                        r.updatedBy = currentUser;
+                        changedRecords.push(r);
+                    }
+                }
+                updatedRecords.push(r);
+            });
+            
+            if (!changed) {
+                showNotification('لم يتم العثور على النشاط.', 'info');
+                return;
+            }
+            
+            localStorage.setItem('sharedRecords', JSON.stringify(updatedRecords));
+            
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                showNotification('جاري تحديث السجلات في جوجل شيت...', 'info');
+                let promises = changedRecords.map(r => {
+                    return fetch(scriptUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify(r)
+                    });
+                });
+                
+                try {
+                    await Promise.all(promises);
+                    showNotification('تم حذف النشاط وتحديث السجلات بنجاح في جوجل شيت', 'success');
+                } catch (err) {
+                    console.error('Error syncing deletion with Google Sheets:', err);
+                    showNotification('حدث خطأ أثناء الاتصال بجوجل شيت، تم التحديث محلياً فقط', 'error');
+                }
+            } else {
+                showNotification('تم الحذف محلياً (رابط جوجل شيت غير مهيأ)', 'success');
+            }
+            
+            loadCumulativeReport(true);
+            loadReports(true);
+        }
+
+        let cachedCumulativeRecords = [];
+
+        async function loadCumulativeReport(forceRefresh = false) {
+            const tbody = document.getElementById('cumulativeTableBody');
+            const monthlyStatsContainer = document.getElementById('monthlySeparatedStatsContainer');
+            const detailedContainer = document.getElementById('detailedWorkplaceTablesContainer');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">جاري جلب البيانات من جوجل شيت...</td></tr>';
+            if (monthlyStatsContainer) monthlyStatsContainer.innerHTML = '<div style="text-align:center; padding:25px; background:#f8f9fa; border-radius:8px;">جاري جلب وفصل إحصائيات الأشهر...</div>';
+            if (detailedContainer) detailedContainer.innerHTML = '<div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px;">جاري جلب وتجميع نشاطات الشعب والأشهر...</div>';
+            
+            cachedCumulativeRecords = await fetchFromGoogleSheets(forceRefresh);
+            renderCumulativeTables();
+        }
+
+        function renderCumulativeTables() {
+            const tbody = document.getElementById('cumulativeTableBody');
+            const monthlyStatsContainer = document.getElementById('monthlySeparatedStatsContainer');
+            const detailedContainer = document.getElementById('detailedWorkplaceTablesContainer');
+            const filterWorkplace = document.getElementById('cumFilterWorkplace') ? document.getElementById('cumFilterWorkplace').value : '';
+            const filterMonth = document.getElementById('cumFilterMonth') ? document.getElementById('cumFilterMonth').value : '';
+            const filterYear = document.getElementById('cumFilterYear') ? document.getElementById('cumFilterYear').value : '';
+
+            const records = (cachedCumulativeRecords && cachedCumulativeRecords.length ? cachedCumulativeRecords : JSON.parse(localStorage.getItem('sharedRecords') || '[]')).filter(r => {
+                if (filterWorkplace && r.workplace !== filterWorkplace) return false;
+                if (filterMonth && r.month !== filterMonth) return false;
+                if (filterYear && r.year !== filterYear) return false;
+                return true;
+            });
+
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+            const map = {};
+            let total = 0;
+            const employees = new Set();
+            records.forEach(r => {
+                if (r.employee) employees.add(r.employee);
+                if (r.activities) r.activities.forEach(a => {
+                    const k = (a.name || '').trim();
+                    if (!k) return;
+                    if (!map[k]) map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                    map[k].count++;
+                    map[k].participants += parseInt(a.participants) || 0;
+                    total += parseInt(a.participants) || 0;
+                    if (a.date) map[k].dates.push(a.date);
+                    if (a.notes) map[k].notes.push(a.notes);
+                });
+            });
+            const activities = Object.values(map).sort((a, b) => b.count - a.count);
+            document.getElementById('totalUniqueActivities').textContent = activities.length;
+            document.getElementById('totalActivitiesCount').textContent = activities.reduce((s, a) => s + a.count, 0);
+            document.getElementById('totalParticipants').textContent = total;
+            document.getElementById('totalEmployees').textContent = employees.size;
+
+            if (activities.length === 0) {
+                if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;">لا توجد بيانات مطابقة للفلتر المحدد</td></tr>';
+                if (monthlyStatsContainer) monthlyStatsContainer.innerHTML = '<div style="text-align:center; padding:25px; background:#f8f9fa; border-radius:8px; color:#777;">لا توجد إحصائيات أشهر مطابقة للفلتر المحدد</div>';
+                if (detailedContainer) detailedContainer.innerHTML = '<div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px; color:#777;">لا توجد نشاطات مرسلة مطابقة للفلتر المحدد</div>';
+                return;
+            }
+
+            // 1. بناء قسم الإحصائيات والجدول التراكمي مفصولاً لكل شهر لوحده
+            if (monthlyStatsContainer) {
+                const byMonth = {};
+                records.forEach(r => {
+                    const m = r.month || 'غير محدد';
+                    const y = r.year || '';
+                    const key = m + '___' + y;
+                    if (!byMonth[key]) {
+                        byMonth[key] = { month: m, year: y, map: {}, totalParticipants: 0, employees: new Set(), workplaces: new Set() };
+                    }
+                    if (r.employee) byMonth[key].employees.add(r.employee);
+                    if (r.workplace) byMonth[key].workplaces.add(r.workplace);
+                    if (r.activities) {
+                        r.activities.forEach(a => {
+                            const k = (a.name || '').trim();
+                            if (!k) return;
+                            if (!byMonth[key].map[k]) {
+                                byMonth[key].map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                            }
+                            byMonth[key].map[k].count++;
+                            const p = parseInt(a.participants) || 0;
+                            byMonth[key].map[k].participants += p;
+                            byMonth[key].totalParticipants += p;
+                            if (a.date) byMonth[key].map[k].dates.push(a.date);
+                            if (a.notes) byMonth[key].map[k].notes.push(a.notes);
+                        });
+                    }
+                });
+
+                const monthList = Object.values(byMonth).filter(mObj => Object.keys(mObj.map).length > 0);
+                monthList.sort((a, b) => {
+                    if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                    return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+                });
+
+                let mHtml = '';
+                monthList.forEach(mObj => {
+                    const mActs = Object.values(mObj.map).sort((a, b) => b.count - a.count);
+                    const mTotalRepeat = mActs.reduce((s, a) => s + a.count, 0);
+                    const safeMonth = mObj.month.replace(/'/g, "\\'");
+                    const safeYear = mObj.year.replace(/'/g, "\\'");
+
+                    mHtml += '<div style="margin-bottom: 22px; border: 2px solid #8e44ad; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">';
+                    mHtml += '<div style="background: linear-gradient(135deg, #8e44ad 0%, #9b59b6 100%); color: #fff; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">';
+                    mHtml += '<div style="font-size: 16px; font-weight: bold;">📅 إحصائيات وتراكمي شهر: <span style="color: gold;">' + mObj.month + ' ' + mObj.year + '</span></div>';
+                    mHtml += '<button class="export-btn excel" onclick="exportSingleMonthSummaryExcel(\'' + safeMonth + '\', \'' + safeYear + '\')" style="background:#27ae60; font-weight:bold; padding:6px 12px; font-size:12px;">📥 حفظ جدول شهر ' + mObj.month + ' كملف Excel</button>';
+                    mHtml += '</div>';
+
+                    mHtml += '<div style="padding: 15px;">';
+                    // البطاقات الإحصائية الخاصة بهذا الشهر فقط
+                    mHtml += '<div class="stats-cards" style="margin-bottom: 12px;">' +
+                                '<div class="stat-card purple" style="background:#faf5ff;"><div class="stat-value">' + mActs.length + '</div><div class="stat-label">أنشطة فريدة (' + mObj.month + ')</div></div>' +
+                                '<div class="stat-card green" style="background:#f2fbf5;"><div class="stat-value">' + mTotalRepeat + '</div><div class="stat-label">إجمالي التكرار (' + mObj.month + ')</div></div>' +
+                                '<div class="stat-card orange" style="background:#fff9f2;"><div class="stat-value">' + mObj.totalParticipants + '</div><div class="stat-label">المشاركين (' + mObj.month + ')</div></div>' +
+                                '<div class="stat-card" style="background:#f4f7fc;"><div class="stat-value">' + mObj.employees.size + '</div><div class="stat-label">الموظفين (' + mObj.month + ')</div></div>' +
+                             '</div>';
+
+                    // جدول التقرير التراكمي الخاص بهذا الشهر لوحده
+                    mHtml += '<div class="reports-table-wrapper"><table class="reports-table cumulative-table" style="min-width: 850px;">' +
+                             '<thead><tr><th>ت</th><th>النشاط</th><th>التكرار في ' + mObj.month + '</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+                    mActs.forEach((a, idx) => {
+                        mHtml += '<tr>' +
+                            '<td>' + (idx + 1) + '</td>' +
+                            '<td><strong style="color:#8e44ad;">' + a.name + '</strong></td>' +
+                            '<td><span class="activity-count">' + a.count + ' مرة</span></td>' +
+                            '<td><span class="participants-sum">' + a.participants + ' مشارك</span></td>' +
+                            '<td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td>' +
+                            '<td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                        '</tr>';
+                    });
+                    mHtml += '</tbody></table></div></div></div>';
+                });
+
+                monthlyStatsContainer.innerHTML = mHtml;
+            }
+
+            // 2. الجدول التراكمي الإجمالي العام
+            if (tbody) {
+                tbody.innerHTML = '';
+                activities.forEach((a, i) => {
+                    tbody.innerHTML += '<tr>' +
+                        '<td>' + (i + 1) + '</td>' +
+                        '<td><strong style="color:#8e44ad;">' + a.name + '</strong></td>' +
+                        '<td><span class="activity-count">' + a.count + ' مرة</span></td>' +
+                        '<td><span class="participants-sum">' + a.participants + ' مشارك</span></td>' +
+                        '<td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td>' +
+                        '<td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                        '<td style="white-space:nowrap;">' +
+                            '<button class="btn-edit" onclick="editActivityNameInAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="تعديل اسم النشاط في جميع السجلات" style="background:#f39c12; margin-left:4px; font-weight:bold; padding:4px 8px; font-size:11px;">✏️ تعديل</button>' +
+                            '<button class="btn-delete" onclick="deleteActivityFromAllRecords(\'' + a.name.replace(/'/g, "\\'") + '\')" title="مسح النشاط من جميع السجلات" style="font-weight:bold; padding:4px 8px; font-size:11px;">🗑️ حذف</button>' +
+                        '</td>' +
+                    '</tr>';
+                });
+            }
+
+            // 3. بناء الجداول المقسمة حسب الشعب وحسب الأشهر بمعلومات كاملة وواضحة كما يرسلها المستخدمون + أيقونة Excel لكل جدول
+            if (detailedContainer) {
+                const groupedByWorkplace = {};
+
+                records.forEach(r => {
+                    const wp = r.workplace || 'غير محدد';
+                    const monthYear = (r.month || 'غير محدد') + ' ' + (r.year || '');
+                    if (!groupedByWorkplace[wp]) groupedByWorkplace[wp] = {};
+                    if (!groupedByWorkplace[wp][monthYear]) {
+                        groupedByWorkplace[wp][monthYear] = {
+                            month: r.month || '',
+                            year: r.year || '',
+                            items: []
+                        };
+                    }
+                    if (r.activities && r.activities.length) {
+                        r.activities.forEach((act, actIndex) => {
+                            if (!act.name || !act.name.trim()) return;
+                            groupedByWorkplace[wp][monthYear].items.push({
+                                recordId: r.id,
+                                actIndex: actIndex,
+                                employee: r.employee || '-',
+                                workplace: wp,
+                                month: r.month || '-',
+                                year: r.year || '-',
+                                name: act.name || '-',
+                                details: act.details || '-',
+                                participants: parseInt(act.participants) || 0,
+                                executor: act.executor || '-',
+                                target: act.target || '-',
+                                attachments: act.attachments || '-',
+                                date: act.date || '-',
+                                notes: act.notes || '-'
+                            });
+                        });
+                    }
+                });
+
+                let html = '';
+                const workplaces = Object.keys(groupedByWorkplace);
+                workplaces.forEach(wp => {
+                    const monthGroups = Object.values(groupedByWorkplace[wp]).filter(mg => mg.items.length > 0);
+                    if (monthGroups.length === 0) return;
+
+                    // ترتيب الأشهر زمنياً
+                    monthGroups.sort((a, b) => {
+                        if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                        return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+                    });
+
+                    const wpTotalActs = monthGroups.reduce((s, mg) => s + mg.items.length, 0);
+                    const wpTotalParts = monthGroups.reduce((s, mg) => s + mg.items.reduce((ps, it) => ps + it.participants, 0), 0);
+                    const safeWp = wp.replace(/'/g, "\\'");
+
+                    html += '<div style="margin-bottom: 25px; border: 2px solid #1e3c72; border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">';
+                    html += '<div style="background: #1e3c72; color: #fff; padding: 12px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">';
+                    html += '<div style="font-size: 16px; font-weight: bold;">🏢 الشعبة / مكان العمل: <span style="color: gold;">' + wp + '</span></div>';
+                    html += '<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px;">' +
+                                '<span style="background: rgba(255,255,255,0.18); padding: 4px 10px; border-radius: 6px;">إجمالي النشاطات: <strong>' + wpTotalActs + '</strong></span>' +
+                                '<span style="background: rgba(39,174,96,0.85); padding: 4px 10px; border-radius: 6px;">إجمالي المشتركين: <strong>' + wpTotalParts + '</strong></span>' +
+                                '<button class="export-btn excel" onclick="exportWorkplaceExcel(\'' + safeWp + '\')" style="background:#27ae60; font-weight:bold; padding:5px 12px; font-size:12px;">📥 حفظ جميع أشهر (' + wp + ') Excel</button>' +
+                            '</div>';
+                    html += '</div>';
+
+                    monthGroups.forEach(mg => {
+                        const monthParts = mg.items.reduce((ps, it) => ps + it.participants, 0);
+                        const safeM = (mg.month || '').replace(/'/g, "\\'");
+                        const safeY = (mg.year || '').replace(/'/g, "\\'");
+
+                        html += '<div style="padding: 12px 15px; border-bottom: 1px solid #e0e0e0;">';
+                        html += '<div style="background: linear-gradient(135deg, #f4ecf7 0%, #e8d5f0 100%); color: #6c3483; padding: 8px 14px; border-radius: 6px; margin-bottom: 10px; border-right: 4px solid #8e44ad; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">';
+                        html += '<strong style="font-size: 14px;">📅 شهر: ' + mg.month + ' ' + mg.year + '</strong>';
+                        html += '<div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">' +
+                                    '<span style="font-size: 12px; font-weight: bold;">عدد النشاطات: ' + mg.items.length + ' | المشتركين: ' + monthParts + ' مشارك</span>' +
+                                    '<button class="export-btn excel" onclick="exportWorkplaceMonthExcel(\'' + safeWp + '\', \'' + safeM + '\', \'' + safeY + '\')" style="background:#16a085; font-weight:bold; padding:4px 10px; font-size:11px;">📥 حفظ هذا الجدول كملف Excel</button>' +
+                                '</div>';
+                        html += '</div>';
+
+                        html += '<div class="reports-table-wrapper">';
+                        html += '<table class="reports-table" style="min-width: 1000px; margin-bottom: 5px;">';
+                        html += '<thead style="background: #2c3e50;"><tr>' +
+                                    '<th style="width:35px;">ت</th>' +
+                                    '<th>الموظف المرسل</th>' +
+                                    '<th>الشهر / السنة</th>' +
+                                    '<th>اسم النشاط</th>' +
+                                    '<th>التفاصيل</th>' +
+                                    '<th>المشتركين</th>' +
+                                    '<th>جهة التنفيذ</th>' +
+                                    '<th>الجهة المستهدفة</th>' +
+                                    '<th>المرفقات</th>' +
+                                    '<th>التاريخ</th>' +
+                                    '<th>الملاحظات</th>' +
+                                    '<th>إجراء</th>' +
+                                '</tr></thead><tbody>';
+
+                        mg.items.forEach((item, idx) => {
+                            html += '<tr>' +
+                                '<td>' + (idx + 1) + '</td>' +
+                                '<td><strong>' + item.employee + '</strong></td>' +
+                                '<td><span style="background:#eef2f7; color:#1e3c72; padding:3px 8px; border-radius:6px; font-weight:bold; font-size:11px;">' + item.month + ' ' + item.year + '</span></td>' +
+                                '<td><strong style="color:#8e44ad;">' + item.name + '</strong></td>' +
+                                '<td style="max-width:220px; white-space:pre-wrap; text-align:right;">' + (item.details || '-') + '</td>' +
+                                '<td><span class="participants-sum">' + item.participants + ' مشارك</span></td>' +
+                                '<td>' + (item.executor || '-') + '</td>' +
+                                '<td>' + (item.target || '-') + '</td>' +
+                                '<td>' + (item.attachments || '-') + '</td>' +
+                                '<td style="direction:ltr;">' + (item.date || '-') + '</td>' +
+                                '<td style="max-width:160px; white-space:pre-wrap;">' + (item.notes || '-') + '</td>' +
+                                '<td style="white-space:nowrap;">' +
+                                    '<button class="btn-edit" onclick="openEditActivityModal(\'' + item.recordId + '\', ' + item.actIndex + ')" title="تعديل هذا النشاط" style="background:#f39c12; margin-left:4px; font-weight:bold; padding:4px 8px; font-size:11px;">✏️ تعديل</button>' +
+                                    '<button class="btn-delete" onclick="deleteSingleActivityFromRecord(\'' + item.recordId + '\', ' + item.actIndex + ')" title="حذف هذا النشاط" style="font-weight:bold; padding:4px 8px; font-size:11px;">🗑️ حذف</button>' +
+                                '</td>' +
+                            '</tr>';
+                        });
+
+                        html += '</tbody></table></div></div>';
+                    });
+
+                    html += '</div>';
+                });
+
+                detailedContainer.innerHTML = html || '<div style="text-align:center; padding:30px; background:#f8f9fa; border-radius:8px; color:#777;">لا توجد نشاطات مفصلة لعرضها</div>';
+            }
+        }
+
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function downloadExcelTable(tableHtml, fileName) {
+            if (!fileName.toLowerCase().endsWith('.xls')) {
+                fileName += '.xls';
+            }
+            const excelDoc = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+                'xmlns:x="urn:schemas-microsoft-com:office:excel" ' +
+                'xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head>' +
+                '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' +
+                '<!--[if gte mso 9]><xml>' +
+                '<x:ExcelWorkbook>' +
+                '<x:ExcelWorksheets>' +
+                '<x:ExcelWorksheet>' +
+                '<x:Name>بيانات التقرير</x:Name>' +
+                '<x:WorksheetOptions>' +
+                '<x:DisplayRightToLeft/>' +
+                '</x:WorksheetOptions>' +
+                '</x:ExcelWorksheet>' +
+                '</x:ExcelWorksheets>' +
+                '</x:ExcelWorkbook>' +
+                '</xml><![endif]-->' +
+                '<style>' +
+                'body { font-family: Tahoma, Arial, sans-serif; direction: rtl; text-align: right; }' +
+                'table { border-collapse: collapse; width: 100%; direction: rtl; margin-bottom: 25px; }' +
+                'th, td { border: 1px solid #7f8c8d; padding: 7px 10px; font-size: 11pt; vertical-align: middle; }' +
+                'th { background-color: #8e44ad; color: #ffffff; font-weight: bold; text-align: center; }' +
+                'td { text-align: center; mso-number-format:"\\@"; }' +
+                '.text-right { text-align: right; }' +
+                '.num { mso-number-format:"0"; text-align: center; font-weight: bold; }' +
+                '.main-title { background-color: #1e3c72; color: #ffffff; font-size: 14pt; font-weight: bold; text-align: center; padding: 12px; }' +
+                '.sub-title { background-color: #2a5298; color: #ffffff; font-size: 12pt; font-weight: bold; text-align: center; padding: 8px; }' +
+                '.sec-title { background-color: #6c3483; color: #ffffff; font-size: 12pt; font-weight: bold; text-align: right; padding: 9px; }' +
+                '.wp-title { background-color: #2c3e50; color: #ffffff; font-size: 11pt; font-weight: bold; text-align: right; padding: 8px; }' +
+                '.stat-lbl { background-color: #f4ecf7; color: #6c3483; font-weight: bold; text-align: center; font-size: 11pt; }' +
+                '.stat-val { background-color: #ffffff; color: #27ae60; font-weight: bold; text-align: center; font-size: 12pt; mso-number-format:"0"; }' +
+                '</style>' +
+                '</head>' +
+                '<body dir="rtl">' +
+                tableHtml +
+                '</body>' +
+                '</html>';
+
+            const blob = new Blob(['\uFEFF' + excelDoc], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('تم حفظ جدول Excel بنجاح وتوزيع البيانات على الأعمدة', 'success');
+        }
+
+        function downloadCSVFile(csvContent, fileName) {
+            const formattedCsv = (csvContent.startsWith('sep=') ? '' : 'sep=,\r\n') + csvContent;
+            const blob = new Blob(['\uFEFF' + formattedCsv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showNotification('تم تحميل الملف بنجاح', 'success');
+        }
+
+        // تصدير جدول إحصائيات شهر واحد منفصل
+        function exportSingleMonthSummaryExcel(month, year) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            const monthRecords = data.records.filter(r => (r.month || '') === month && (r.year || '') === year);
+            const map = {};
+            let totalParts = 0;
+            const emps = new Set();
+            monthRecords.forEach(r => {
+                if (r.employee) emps.add(r.employee);
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        const k = (a.name || '').trim();
+                        if (!k) return;
+                        if (!map[k]) map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                        map[k].count++;
+                        const p = parseInt(a.participants) || 0;
+                        map[k].participants += p;
+                        totalParts += p;
+                        if (a.date) map[k].dates.push(a.date);
+                        if (a.notes) map[k].notes.push(a.notes);
+                    });
+                }
+            });
+            const acts = Object.values(map).sort((a, b) => b.count - a.count);
+            if (!acts.length) { showNotification('لا توجد بيانات لهذا الشهر!', 'error'); return; }
+
+            let rows = '';
+            acts.forEach((a, i) => {
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="num">' + a.count + '</td>' +
+                    '<td class="num">' + a.participants + '</td>' +
+                    '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                    '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                '</tr>';
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="6" class="sec-title">📅 إحصائيات وتراكمي شهر: ' + escapeHtml(month) + ' ' + escapeHtml(year) + '</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">أنشطة فريدة</th><td class="stat-val num">' + acts.length + '</td>' +
+                        '<th class="stat-lbl">إجمالي التكرار</th><td class="stat-val num">' + acts.reduce((s, a) => s + a.count, 0) + '</td>' +
+                        '<th class="stat-lbl">المشاركين</th><td class="stat-val num">' + totalParts + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl" colspan="2">عدد الموظفين المشاركين</th>' +
+                        '<td class="stat-val num" colspan="4">' + emps.size + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th style="width:45px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th style="width:100px;">التكرار</th>' +
+                        '<th style="width:110px;">المشتركين</th>' +
+                        '<th>التواريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'إحصائيات_شهر_' + month + '_' + year + '.xls');
+        }
+
+        // تصدير إحصائيات جميع الأشهر كل شهر مفصول لوحده
+        function exportAllMonthlySummaryExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (!data.records.length) { showNotification('لا توجد بيانات!', 'error'); return; }
+
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            const byMonth = {};
+            data.records.forEach(r => {
+                const m = r.month || 'غير محدد';
+                const y = r.year || '';
+                const key = m + '___' + y;
+                if (!byMonth[key]) byMonth[key] = { month: m, year: y, map: {}, totalParticipants: 0, employees: new Set() };
+                if (r.employee) byMonth[key].employees.add(r.employee);
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        const k = (a.name || '').trim();
+                        if (!k) return;
+                        if (!byMonth[key].map[k]) byMonth[key].map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                        byMonth[key].map[k].count++;
+                        const p = parseInt(a.participants) || 0;
+                        byMonth[key].map[k].participants += p;
+                        byMonth[key].totalParticipants += p;
+                        if (a.date) byMonth[key].map[k].dates.push(a.date);
+                        if (a.notes) byMonth[key].map[k].notes.push(a.notes);
+                    });
+                }
+            });
+
+            const monthList = Object.values(byMonth).filter(mObj => Object.keys(mObj.map).length > 0);
+            monthList.sort((a, b) => {
+                if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+            });
+
+            let tablesHtml = '<table><tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                '<tr><th colspan="6" class="sub-title">التقرير الإحصائي التراكمي مفصولاً حسب الأشهر</th></tr></table>';
+
+            monthList.forEach(mObj => {
+                const acts = Object.values(mObj.map).sort((a, b) => b.count - a.count);
+                let rows = '';
+                acts.forEach((a, i) => {
+                    rows += '<tr>' +
+                        '<td class="num">' + (i + 1) + '</td>' +
+                        '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                        '<td class="num">' + a.count + '</td>' +
+                        '<td class="num">' + a.participants + '</td>' +
+                        '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                        '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                    '</tr>';
+                });
+
+                tablesHtml += '<table>' +
+                    '<thead>' +
+                        '<tr><th colspan="6" class="sec-title">📅 شهر: ' + escapeHtml(mObj.month) + ' ' + escapeHtml(mObj.year) + '</th></tr>' +
+                        '<tr>' +
+                            '<th class="stat-lbl">أنشطة فريدة</th><td class="stat-val num">' + acts.length + '</td>' +
+                            '<th class="stat-lbl">إجمالي التكرار</th><td class="stat-val num">' + acts.reduce((s, a) => s + a.count, 0) + '</td>' +
+                            '<th class="stat-lbl">المشاركين</th><td class="stat-val num">' + mObj.totalParticipants + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th class="stat-lbl" colspan="2">عدد الموظفين المشاركين</th>' +
+                            '<td class="stat-val num" colspan="4">' + mObj.employees.size + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<th style="width:45px;">ت</th>' +
+                            '<th>النشاط</th>' +
+                            '<th style="width:100px;">التكرار في ' + escapeHtml(mObj.month) + '</th>' +
+                            '<th style="width:110px;">المشتركين</th>' +
+                            '<th>التواريخ</th>' +
+                            '<th>الملاحظات</th>' +
+                        '</tr>' +
+                    '</thead>' +
+                    '<tbody>' + rows + '</tbody>' +
+                '</table><br/>';
+            });
+
+            downloadExcelTable(tablesHtml, 'إحصائيات_الأشهر_المنفصلة_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        // تصدير الجدول التراكمي الإجمالي فقط
+        function exportSummaryTableOnlyExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (!data.activities.length) { showNotification('لا توجد بيانات!', 'error'); return; }
+
+            let rows = '';
+            data.activities.forEach((a, i) => {
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="num">' + a.count + '</td>' +
+                    '<td class="num">' + a.participants + '</td>' +
+                    '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                    '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                '</tr>';
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="6" class="sub-title">📋 الجدول التراكمي الإجمالي (جميع الأشهر والشعب المحددة)</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:45px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th style="width:100px;">إجمالي التكرار</th>' +
+                        '<th style="width:110px;">إجمالي المشتركين</th>' +
+                        '<th>التواريخ المسجلة</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'الجدول_التراكمي_الإجمالي_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        // تصدير جدول شعبة معينة في شهر معين
+        function exportWorkplaceMonthExcel(workplace, month, year) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            const filtered = data.records.filter(r => (r.workplace || 'غير محدد') === workplace && (r.month || '') === month && (r.year || '') === year);
+            const items = [];
+            filtered.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        if (!a.name || !a.name.trim()) return;
+                        items.push({ employee: r.employee || '-', workplace: r.workplace || '-', month: r.month || '-', year: r.year || '-', ...a });
+                    });
+                }
+            });
+            if (!items.length) { showNotification('لا توجد نشاطات لتصديرها!', 'error'); return; }
+
+            let rows = '';
+            items.forEach((it, idx) => {
+                rows += '<tr>' +
+                    '<td class="num">' + (idx + 1) + '</td>' +
+                    '<td><strong>' + escapeHtml(it.employee) + '</strong></td>' +
+                    '<td>' + escapeHtml(it.workplace) + '</td>' +
+                    '<td>' + escapeHtml(it.month + ' ' + it.year) + '</td>' +
+                    '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(it.name) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.details) + '</td>' +
+                    '<td class="num">' + (parseInt(it.participants) || 0) + '</td>' +
+                    '<td>' + escapeHtml(it.executor) + '</td>' +
+                    '<td>' + escapeHtml(it.target) + '</td>' +
+                    '<td>' + escapeHtml(it.attachments) + '</td>' +
+                    '<td>' + escapeHtml(it.date) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.notes) + '</td>' +
+                '</tr>';
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="12" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="12" class="wp-title">🏢 نشاطات: ' + escapeHtml(workplace) + ' | 📅 شهر: ' + escapeHtml(month + ' ' + year) + '</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th>الشهر / السنة</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'نشاطات_' + workplace + '_' + month + '_' + year + '.xls');
+        }
+
+        // تصدير جميع أشهر شعبة معينة
+        function exportWorkplaceExcel(workplace) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            const filtered = data.records.filter(r => (r.workplace || 'غير محدد') === workplace);
+            const items = [];
+            filtered.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        if (!a.name || !a.name.trim()) return;
+                        items.push({ employee: r.employee || '-', workplace: r.workplace || '-', month: r.month || '-', year: r.year || '-', ...a });
+                    });
+                }
+            });
+            if (!items.length) { showNotification('لا توجد نشاطات لتصديرها!', 'error'); return; }
+
+            let rows = '';
+            items.forEach((it, idx) => {
+                rows += '<tr>' +
+                    '<td class="num">' + (idx + 1) + '</td>' +
+                    '<td><strong>' + escapeHtml(it.employee) + '</strong></td>' +
+                    '<td>' + escapeHtml(it.workplace) + '</td>' +
+                    '<td>' + escapeHtml(it.month + ' ' + it.year) + '</td>' +
+                    '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(it.name) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.details) + '</td>' +
+                    '<td class="num">' + (parseInt(it.participants) || 0) + '</td>' +
+                    '<td>' + escapeHtml(it.executor) + '</td>' +
+                    '<td>' + escapeHtml(it.target) + '</td>' +
+                    '<td>' + escapeHtml(it.attachments) + '</td>' +
+                    '<td>' + escapeHtml(it.date) + '</td>' +
+                    '<td class="text-right">' + escapeHtml(it.notes) + '</td>' +
+                '</tr>';
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="12" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="12" class="wp-title">🏢 جميع نشاطات شعبة: ' + escapeHtml(workplace) + '</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th>الشهر / السنة</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'جميع_نشاطات_' + workplace + '.xls');
+        }
+
+        // تصدير جميع جداول الشعب التفصيلية
+        function exportAllDetailedWorkplaceExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (!data.records.length) { showNotification('لا توجد بيانات!', 'error'); return; }
+
+            let rows = '';
+            let counter = 1;
+            data.records.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        if (!a.name || !a.name.trim()) return;
+                        rows += '<tr>' +
+                            '<td class="num">' + (counter++) + '</td>' +
+                            '<td>' + escapeHtml(r.workplace || '') + '</td>' +
+                            '<td>' + escapeHtml(r.month || '') + '</td>' +
+                            '<td>' + escapeHtml(r.year || '') + '</td>' +
+                            '<td><strong>' + escapeHtml(r.employee || '') + '</strong></td>' +
+                            '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.details || '') + '</td>' +
+                            '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                            '<td>' + escapeHtml(a.executor || '') + '</td>' +
+                            '<td>' + escapeHtml(a.target || '') + '</td>' +
+                            '<td>' + escapeHtml(a.attachments || '') + '</td>' +
+                            '<td>' + escapeHtml(a.date || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.notes || '') + '</td>' +
+                        '</tr>';
+                    });
+                }
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="13" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="13" class="sub-title">🏢 جدول نشاطات الشعب التفصيلي الكامل (حسب الأشهر والشعب)</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th style="width:70px;">الشهر</th>' +
+                        '<th style="width:60px;">السنة</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'نشاطات_الشعب_التفصيلية_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        // تصدير جدول حسابات المستخدمين في لوحة التحكم
+        function exportUsersExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const users = getUsers();
+            const arr = Object.keys(users).map(u => ({ username: u, ...users[u] }));
+            if (!arr.length) { showNotification('لا يوجد مستخدمون!', 'error'); return; }
+
+            let rows = '';
+            arr.forEach((u, i) => {
+                rows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td><strong>' + escapeHtml(u.username) + '</strong></td>' +
+                    '<td>' + escapeHtml(u.password) + '</td>' +
+                    '<td>' + (u.role === 'admin' ? '<strong style="color:red;">أدمن</strong>' : 'مستخدم') + '</td>' +
+                    '<td>' + new Date(u.createdAt).toLocaleDateString('ar-IQ') + '</td>' +
+                    '<td>' + escapeHtml(u.createdBy || '-') + '</td>' +
+                '</tr>';
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">لوحة تحكم الأدمن - جدول حسابات المستخدمين</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>اسم المستخدم</th>' +
+                        '<th>كلمة المرور</th>' +
+                        '<th>الصلاحية</th>' +
+                        '<th>تاريخ الإضافة</th>' +
+                        '<th>أُضيف بواسطة</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'حسابات_المستخدمين_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        async function deleteSingleActivityFromRecord(recordId, actIndex) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            if (!confirm('هل أنت متأكد من حذف هذا النشاط من سجل الشعبة؟')) return;
+
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const rIdx = records.findIndex(r => r.id.toString() === recordId.toString());
+            if (rIdx === -1 || !records[rIdx].activities) {
+                showNotification('لم يتم العثور على السجل!', 'error');
+                return;
+            }
+
+            records[rIdx].activities.splice(actIndex, 1);
+            const now = new Date();
+            records[rIdx].timestamp = now.getTime();
+            records[rIdx].lastUpdated = now.toLocaleString('ar-IQ');
+            records[rIdx].updatedBy = currentUser;
+
+            localStorage.setItem('sharedRecords', JSON.stringify(records));
+            cachedCumulativeRecords = records;
+
+            let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                sendToGoogleSheets(records[rIdx]);
+            }
+
+            renderCumulativeTables();
+            loadReports(true);
+            showNotification('تم حذف النشاط بنجاح', 'success');
+        }
+
+        function populateEditModalDropdowns() {
+            const empSelect = document.getElementById('editRecEmployee');
+            const origEmpSelect = document.getElementById('employee');
+            if (empSelect && origEmpSelect) {
+                empSelect.innerHTML = origEmpSelect.innerHTML;
+            }
+            const wpSelect = document.getElementById('editRecWorkplace');
+            const origWpSelect = document.getElementById('workplace');
+            if (wpSelect && origWpSelect) {
+                wpSelect.innerHTML = origWpSelect.innerHTML;
+            }
+        }
+
+        function openEditActivityModal(recordId, actIndex) {
+            if (currentUserRole !== 'admin') {
+                showNotification('غير مصرح! صلاحية الأدمن مطلوبة للتعديل', 'error');
+                return;
+            }
+
+            const allRecords = (cachedCumulativeRecords && cachedCumulativeRecords.length) 
+                ? cachedCumulativeRecords 
+                : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+
+            const record = allRecords.find(r => r.id && r.id.toString() === recordId.toString());
+            if (!record || !record.activities || !record.activities[actIndex]) {
+                showNotification('لم يتم العثور على النشاط المحدد!', 'error');
+                return;
+            }
+
+            const act = record.activities[actIndex];
+
+            document.getElementById('editRecordId').value = recordId;
+            document.getElementById('editActIndex').value = actIndex;
+
+            populateEditModalDropdowns();
+
+            const empSelect = document.getElementById('editRecEmployee');
+            if (empSelect && record.employee) {
+                if (!Array.from(empSelect.options).some(o => o.value === record.employee)) {
+                    const opt = document.createElement('option');
+                    opt.value = record.employee;
+                    opt.textContent = record.employee;
+                    empSelect.appendChild(opt);
+                }
+                empSelect.value = record.employee;
+            }
+
+            const wpSelect = document.getElementById('editRecWorkplace');
+            if (wpSelect && record.workplace) {
+                if (!Array.from(wpSelect.options).some(o => o.value === record.workplace)) {
+                    const opt = document.createElement('option');
+                    opt.value = record.workplace;
+                    opt.textContent = record.workplace;
+                    wpSelect.appendChild(opt);
+                }
+                wpSelect.value = record.workplace;
+            }
+
+            document.getElementById('editRecMonth').value = record.month || '';
+            document.getElementById('editRecYear').value = record.year || '';
+
+            document.getElementById('editActName').value = act.name || '';
+            document.getElementById('editActDetails').value = act.details || '';
+            document.getElementById('editActParticipants').value = (act.participants !== undefined && act.participants !== null) ? act.participants : 0;
+            document.getElementById('editActExecutor').value = act.executor || '';
+            document.getElementById('editActTarget').value = act.target || '';
+            document.getElementById('editActAttachments').value = act.attachments || '';
+            document.getElementById('editActDate').value = act.date || '';
+            document.getElementById('editActNotes').value = act.notes || '';
+
+            const modal = document.getElementById('editActivityModal');
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        function closeEditActivityModal() {
+            const modal = document.getElementById('editActivityModal');
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        function handleModalOverlayClick(e) {
+            if (e.target.id === 'editActivityModal') {
+                closeEditActivityModal();
+            }
+        }
+
+        async function saveEditedActivity() {
+            if (currentUserRole !== 'admin') {
+                showNotification('غير مصرح!', 'error');
+                return;
+            }
+
+            const recordId = document.getElementById('editRecordId').value;
+            const actIndex = parseInt(document.getElementById('editActIndex').value);
+
+            const newName = document.getElementById('editActName').value.trim();
+            if (!newName) {
+                showNotification('يرجى إدخال اسم النشاط!', 'error');
+                return;
+            }
+
+            const newMonth = document.getElementById('editRecMonth').value;
+            const newYear = document.getElementById('editRecYear').value;
+            const newEmployee = document.getElementById('editRecEmployee').value;
+            const newWorkplace = document.getElementById('editRecWorkplace').value;
+
+            if (!newMonth || !newYear || !newEmployee || !newWorkplace) {
+                showNotification('يرجى ملء كافة بيانات السجل (الشهر، السنة، الموظف، مكان العمل)!', 'error');
+                return;
+            }
+
+            const newDetails = document.getElementById('editActDetails').value.trim();
+            const newParticipants = parseInt(document.getElementById('editActParticipants').value) || 0;
+            const newExecutor = document.getElementById('editActExecutor').value.trim();
+            const newTarget = document.getElementById('editActTarget').value.trim();
+            const newAttachments = document.getElementById('editActAttachments').value.trim();
+            const newDate = document.getElementById('editActDate').value;
+            const newNotes = document.getElementById('editActNotes').value.trim();
+
+            const saveBtn = document.getElementById('saveEditActBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '⏳ جاري الحفظ...';
+            }
+
+            showNotification('جاري حفظ التعديلات ومزامنتها...', 'info');
+
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const rIdx = records.findIndex(r => r.id && r.id.toString() === recordId.toString());
+            if (rIdx === -1 || !records[rIdx].activities || !records[rIdx].activities[actIndex]) {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = '💾 حفظ التعديلات';
+                }
+                showNotification('لم يتم العثور على النشاط في السجلات!', 'error');
+                return;
+            }
+
+            const oldRecord = records[rIdx];
+            const oldAct = oldRecord.activities[actIndex];
+
+            const updatedAct = {
+                ...oldAct,
+                name: newName,
+                details: newDetails,
+                participants: newParticipants,
+                executor: newExecutor,
+                target: newTarget,
+                attachments: newAttachments,
+                date: newDate,
+                notes: newNotes
+            };
+
+            const now = new Date();
+            const scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+            const metaChanged = (oldRecord.month !== newMonth || oldRecord.year !== newYear || oldRecord.employee !== newEmployee || oldRecord.workplace !== newWorkplace);
+
+            if (!metaChanged) {
+                oldRecord.activities[actIndex] = updatedAct;
+                oldRecord.timestamp = now.getTime();
+                oldRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                oldRecord.updatedBy = currentUser;
+                
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                cachedCumulativeRecords = records;
+                if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                    sendToGoogleSheets(oldRecord);
+                }
+            } else {
+                if (oldRecord.activities.length === 1) {
+                    oldRecord.month = newMonth;
+                    oldRecord.year = newYear;
+                    oldRecord.employee = newEmployee;
+                    oldRecord.workplace = newWorkplace;
+                    oldRecord.activities[0] = updatedAct;
+                    oldRecord.timestamp = now.getTime();
+                    oldRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                    oldRecord.updatedBy = currentUser;
+
+                    localStorage.setItem('sharedRecords', JSON.stringify(records));
+                    cachedCumulativeRecords = records;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        sendToGoogleSheets(oldRecord);
+                    }
+                } else {
+                    oldRecord.activities.splice(actIndex, 1);
+                    oldRecord.timestamp = now.getTime();
+                    oldRecord.lastUpdated = now.toLocaleString('ar-IQ');
+                    oldRecord.updatedBy = currentUser;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        sendToGoogleSheets(oldRecord);
+                    }
+
+                    const targetIdx = records.findIndex(r => r.month === newMonth && r.year === newYear && r.employee === newEmployee && r.workplace === newWorkplace && r.id.toString() !== oldRecord.id.toString());
+
+                    if (targetIdx !== -1) {
+                        const targetRec = records[targetIdx];
+                        const tLen = targetRec.activities ? targetRec.activities.length : 0;
+                        targetRec.activities = targetRec.activities || [];
+                        targetRec.activities.push({ ...updatedAct, t: tLen + 1 });
+                        targetRec.timestamp = now.getTime();
+                        targetRec.lastUpdated = now.toLocaleString('ar-IQ');
+                        targetRec.updatedBy = currentUser;
+                        if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                            sendToGoogleSheets(targetRec);
+                        }
+                    } else {
+                        const newRec = {
+                            id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                            timestamp: now.getTime(),
+                            date: now.toLocaleString('ar-IQ'),
+                            month: newMonth,
+                            year: newYear,
+                            employee: newEmployee,
+                            workplace: newWorkplace,
+                            activities: [{ ...updatedAct, t: 1 }],
+                            savedBy: currentUser,
+                            lastUpdated: now.toLocaleString('ar-IQ'),
+                            updatedBy: currentUser,
+                            expiryDate: now.getTime() + (31 * 24 * 60 * 60 * 1000)
+                        };
+                        records.push(newRec);
+                        if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                            sendToGoogleSheets(newRec);
+                        }
+                    }
+
+                    localStorage.setItem('sharedRecords', JSON.stringify(records));
+                    cachedCumulativeRecords = records;
+                }
+            }
+
+            if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = '💾 حفظ التعديلات';
+            }
+
+            closeEditActivityModal();
+            renderCumulativeTables();
+            loadReports(true);
+            showNotification('تم حفظ التعديلات ومزامنتها بنجاح', 'success');
+        }
+
+        async function editActivityNameInAllRecords(oldName) {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const newName = prompt('تعديل اسم النشاط في جميع السجلات:\nمن: ' + oldName + '\nإلى:', oldName);
+            if (!newName || !newName.trim() || newName.trim() === oldName) return;
+
+            showNotification('جاري تعديل اسم النشاط في جميع السجلات...', 'info');
+            let records = [];
+            try {
+                records = await fetchFromGoogleSheets(true);
+            } catch (e) {
+                records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            }
+
+            const trimmedNew = newName.trim();
+            let modifiedCount = 0;
+            const promises = [];
+            const scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+
+            records.forEach(r => {
+                let changed = false;
+                if (r.activities) {
+                    r.activities.forEach(act => {
+                        if ((act.name || '').trim() === oldName) {
+                            act.name = trimmedNew;
+                            changed = true;
+                        }
+                    });
+                }
+                if (changed) {
+                    modifiedCount++;
+                    r.timestamp = Date.now();
+                    r.lastUpdated = new Date().toLocaleString('ar-IQ');
+                    r.updatedBy = currentUser;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        promises.push(sendToGoogleSheets(r));
+                    }
+                }
+            });
+
+            if (modifiedCount > 0) {
+                localStorage.setItem('sharedRecords', JSON.stringify(records));
+                cachedCumulativeRecords = records;
+                try { await Promise.all(promises); } catch (err) { console.error(err); }
+                loadCumulativeReport(true);
+                loadReports(true);
+                showNotification('تم تعديل اسم النشاط في ' + modifiedCount + ' سجل بنجاح', 'success');
+            } else {
+                showNotification('لم يتم العثور على أي نشاط مطابق', 'info');
+            }
+        }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEditActivityModal();
+            }
+        });
+
+
+        function getFilteredCumulativeData() {
+            const filterWorkplace = document.getElementById('cumFilterWorkplace') ? document.getElementById('cumFilterWorkplace').value : '';
+            const filterMonth = document.getElementById('cumFilterMonth') ? document.getElementById('cumFilterMonth').value : '';
+            const filterYear = document.getElementById('cumFilterYear') ? document.getElementById('cumFilterYear').value : '';
+
+            const allRecords = cachedCumulativeRecords && cachedCumulativeRecords.length ? cachedCumulativeRecords : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            const records = allRecords.filter(r => {
+                if (filterWorkplace && r.workplace !== filterWorkplace) return false;
+                if (filterMonth && r.month !== filterMonth) return false;
+                if (filterYear && r.year !== filterYear) return false;
+                return true;
+            });
+
+            const map = {};
+            let total = 0;
+            records.forEach(r => {
+                if (r.activities) r.activities.forEach(a => {
+                    const k = (a.name || '').trim();
+                    if (!k) return;
+                    if (!map[k]) map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                    map[k].count++;
+                    map[k].participants += parseInt(a.participants) || 0;
+                    total += parseInt(a.participants) || 0;
+                    if (a.date) map[k].dates.push(a.date);
+                    if (a.notes) map[k].notes.push(a.notes);
+                });
+            });
+            return { records, activities: Object.values(map).sort((a, b) => b.count - a.count), totalParticipants: total, employees: new Set(records.map(r => r.employee)) };
+        }
+
+        function buildPrintHTML(activities, totalParticipants, employees, records = []) {
+            let rows = '';
+            activities.forEach((a, i) => {
+                rows += '<tr><td>' + (i + 1) + '</td><td style="text-align:right;"><strong>' + a.name + '</strong></td><td>' + a.count + '</td><td>' + a.participants + '</td><td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td><td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td></tr>';
+            });
+
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+            // 1. بناء قسم الإحصائيات المنفصلة لكل شهر للطباعة
+            const byMonth = {};
+            records.forEach(r => {
+                const m = r.month || 'غير محدد';
+                const y = r.year || '';
+                const key = m + '___' + y;
+                if (!byMonth[key]) byMonth[key] = { month: m, year: y, map: {}, totalParticipants: 0, employees: new Set() };
+                if (r.employee) byMonth[key].employees.add(r.employee);
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        const k = (a.name || '').trim();
+                        if (!k) return;
+                        if (!byMonth[key].map[k]) byMonth[key].map[k] = { name: k, count: 0, participants: 0, dates: [], notes: [] };
+                        byMonth[key].map[k].count++;
+                        const p = parseInt(a.participants) || 0;
+                        byMonth[key].map[k].participants += p;
+                        byMonth[key].totalParticipants += p;
+                        if (a.date) byMonth[key].map[k].dates.push(a.date);
+                        if (a.notes) byMonth[key].map[k].notes.push(a.notes);
+                    });
+                }
+            });
+            const monthList = Object.values(byMonth).filter(mObj => Object.keys(mObj.map).length > 0);
+            monthList.sort((a, b) => {
+                if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+            });
+
+            let monthlyPrintHtml = '<h2 style="color:#6c3483; margin-top:25px; border-bottom:2px solid #8e44ad; padding-bottom:6px;">أولاً: الإحصائيات والتقرير التراكمي مفصولاً حسب كل شهر</h2>';
+            monthList.forEach(mObj => {
+                const mActs = Object.values(mObj.map).sort((a, b) => b.count - a.count);
+                const mRepeat = mActs.reduce((s, a) => s + a.count, 0);
+                monthlyPrintHtml += '<div style="margin-top:14px; page-break-inside:avoid;">';
+                monthlyPrintHtml += '<div style="background:#8e44ad; color:#fff; padding:7px 12px; font-weight:bold;">شهر: ' + mObj.month + ' ' + mObj.year + ' | أنشطة فريدة: ' + mActs.length + ' | إجمالي التكرار: ' + mRepeat + ' | المشاركين: ' + mObj.totalParticipants + ' | الموظفين: ' + mObj.employees.size + '</div>';
+                monthlyPrintHtml += '<table style="margin-bottom:10px;"><thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+                mActs.forEach((a, idx) => {
+                    monthlyPrintHtml += '<tr><td>' + (idx + 1) + '</td><td style="text-align:right;"><strong>' + a.name + '</strong></td><td>' + a.count + '</td><td>' + a.participants + '</td><td>' + ([...new Set(a.dates)].join(' , ') || '-') + '</td><td>' + ([...new Set(a.notes)].join(' | ') || '-') + '</td></tr>';
+                });
+                monthlyPrintHtml += '</tbody></table></div>';
+            });
+
+            // 2. بناء الجداول التفصيلية حسب الشعب والأشهر للطباعة
+            const groupedByWorkplace = {};
+            records.forEach(r => {
+                const wp = r.workplace || 'غير محدد';
+                const monthYear = (r.month || 'غير محدد') + ' ' + (r.year || '');
+                if (!groupedByWorkplace[wp]) groupedByWorkplace[wp] = {};
+                if (!groupedByWorkplace[wp][monthYear]) {
+                    groupedByWorkplace[wp][monthYear] = { month: r.month || '', year: r.year || '', items: [] };
+                }
+                if (r.activities) {
+                    r.activities.forEach(act => {
+                        if (!act.name || !act.name.trim()) return;
+                        groupedByWorkplace[wp][monthYear].items.push({
+                            employee: r.employee || '-',
+                            month: r.month || '-',
+                            year: r.year || '-',
+                            name: act.name || '-',
+                            details: act.details || '-',
+                            participants: parseInt(act.participants) || 0,
+                            executor: act.executor || '-',
+                            target: act.target || '-',
+                            attachments: act.attachments || '-',
+                            date: act.date || '-',
+                            notes: act.notes || '-'
+                        });
+                    });
+                }
+            });
+
+            let detailedHtml = '<h2 style="color:#1e3c72; margin-top:30px; border-bottom:2px solid #1e3c72; padding-bottom:8px;">ثالثاً: تفاصيل نشاطات الشعب حسب الأشهر</h2>';
+            Object.keys(groupedByWorkplace).forEach(wp => {
+                const monthGroups = Object.values(groupedByWorkplace[wp]).filter(mg => mg.items.length > 0);
+                if (!monthGroups.length) return;
+                monthGroups.sort((a, b) => {
+                    if (a.year !== b.year) return (parseInt(b.year) || 0) - (parseInt(a.year) || 0);
+                    return monthsOrder.indexOf(a.month) - monthsOrder.indexOf(b.month);
+                });
+                detailedHtml += '<div style="margin-top:18px; page-break-inside:avoid;"><h3 style="background:#1e3c72; color:#fff; padding:8px 12px; margin:0;">الشعبة / مكان العمل: ' + wp + '</h3>';
+                monthGroups.forEach(mg => {
+                    detailedHtml += '<div style="background:#f4ecf7; color:#6c3483; padding:6px 10px; font-weight:bold; border:1px solid #ddd;">شهر: ' + mg.month + ' ' + mg.year + ' (عدد النشاطات: ' + mg.items.length + ')</div>';
+                    detailedHtml += '<table style="margin-bottom:12px;"><thead><tr style="background:#2c3e50; color:#fff;"><th>ت</th><th>الموظف</th><th>الشهر</th><th>النشاط</th><th>التفاصيل</th><th>المشتركين</th><th>جهة التنفيذ</th><th>الجهة المستهدفة</th><th>المرفقات</th><th>التاريخ</th><th>الملاحظات</th></tr></thead><tbody>';
+                    mg.items.forEach((it, idx) => {
+                        detailedHtml += '<tr><td>' + (idx + 1) + '</td><td>' + it.employee + '</td><td>' + it.month + ' ' + it.year + '</td><td><strong>' + it.name + '</strong></td><td>' + it.details + '</td><td>' + it.participants + '</td><td>' + it.executor + '</td><td>' + it.target + '</td><td>' + it.attachments + '</td><td>' + it.date + '</td><td>' + it.notes + '</td></tr>';
+                    });
+                    detailedHtml += '</tbody></table>';
+                });
+                detailedHtml += '</div>';
+            });
+
+            return '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>التقرير التراكمي</title><style>body { font-family: Arial, sans-serif; padding: 20px; direction: rtl; font-size: 11px; } .header { text-align: center; border-bottom: 3px solid #8e44ad; padding-bottom: 15px; margin-bottom: 20px; } .header h1 { color: #1e3c72; } .info-box { background: #f8f9fa; padding: 15px; margin-bottom: 20px; } table { width: 100%; border-collapse: collapse; } thead { background: #8e44ad; color: #fff; } th, td { padding: 6px; border: 1px solid #ddd; text-align: center; } @page { size: A4 landscape; margin: 1cm; }</style></head><body><div class="header"><h1>وزارة التربية - مديرية تربية المثنى</h1><h2>قسم الإعداد والتدريب - التقرير التراكمي ونشاطات الشعب</h2></div><div class="info-box"><strong>التاريخ:</strong> ' + new Date().toLocaleString('ar-IQ') + '<br><strong>إجمالي الأنشطة الفريدة:</strong> ' + activities.length + ' | <strong>إجمالي المشاركين:</strong> ' + totalParticipants + ' | <strong>عدد الموظفين:</strong> ' + employees.size + '</div>' + monthlyPrintHtml + '<h2 style="color:#8e44ad; margin-top:25px; border-bottom:2px solid #8e44ad; padding-bottom:6px;">ثانياً: الجدول التراكمي الإجمالي العام</h2><table><thead><tr><th>ت</th><th>النشاط</th><th>التكرار</th><th>المشتركين</th><th>التواريخ</th><th>الملاحظات</th></tr></thead><tbody>' + rows + '</tbody></table>' + detailedHtml + '</body></html>';
+        }
+
+        function exportCumulativePDF() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
+            const w = window.open('', '_blank');
+            w.document.write(buildPrintHTML(data.activities, data.totalParticipants, data.employees, data.records));
+            w.document.close();
+            setTimeout(() => w.print(), 500);
+        }
+
+        function printCumulativeReport() { exportCumulativePDF(); }
+        function exportPDF() { if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; } exportCumulativePDF(); }
+
+        function exportCumulativeExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredCumulativeData();
+            if (data.activities.length === 0) { showNotification('لا توجد بيانات!', 'error'); return; }
+
+            // 1. الجدول التراكمي الإجمالي العام
+            let summaryRows = '';
+            data.activities.forEach((a, i) => {
+                summaryRows += '<tr>' +
+                    '<td class="num">' + (i + 1) + '</td>' +
+                    '<td style="font-weight:bold; color:#6c3483;">' + escapeHtml(a.name) + '</td>' +
+                    '<td class="num">' + a.count + '</td>' +
+                    '<td class="num">' + a.participants + '</td>' +
+                    '<td>' + escapeHtml([...new Set(a.dates)].join(' ، ') || '-') + '</td>' +
+                    '<td class="text-right">' + escapeHtml([...new Set(a.notes)].join(' | ') || '-') + '</td>' +
+                '</tr>';
+            });
+
+            // 2. جدول نشاطات الشعب التفصيلي الكامل
+            let detailedRows = '';
+            let counter = 1;
+            data.records.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        if (!a.name || !a.name.trim()) return;
+                        detailedRows += '<tr>' +
+                            '<td class="num">' + (counter++) + '</td>' +
+                            '<td>' + escapeHtml(r.workplace || '') + '</td>' +
+                            '<td>' + escapeHtml(r.month || '') + '</td>' +
+                            '<td>' + escapeHtml(r.year || '') + '</td>' +
+                            '<td><strong>' + escapeHtml(r.employee || '') + '</strong></td>' +
+                            '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.details || '') + '</td>' +
+                            '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                            '<td>' + escapeHtml(a.executor || '') + '</td>' +
+                            '<td>' + escapeHtml(a.target || '') + '</td>' +
+                            '<td>' + escapeHtml(a.attachments || '') + '</td>' +
+                            '<td>' + escapeHtml(a.date || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.notes || '') + '</td>' +
+                        '</tr>';
+                    });
+                }
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="6" class="main-title">وزارة التربية - مديرية تربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="6" class="sub-title">التقرير التراكمي الشامل لنشاطات الشعب</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl">إجمالي الأنشطة الفريدة</th><td class="stat-val num">' + data.activities.length + '</td>' +
+                        '<th class="stat-lbl">إجمالي المشاركين</th><td class="stat-val num">' + data.totalParticipants + '</td>' +
+                        '<th class="stat-lbl">عدد الموظفين</th><td class="stat-val num">' + data.employees.size + '</td>' +
+                    '</tr>' +
+                    '<tr><th colspan="6" class="sec-title">أولاً: الجدول التراكمي الإجمالي العام</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:45px;">ت</th>' +
+                        '<th>النشاط</th>' +
+                        '<th style="width:100px;">إجمالي التكرار</th>' +
+                        '<th style="width:110px;">إجمالي المشتركين</th>' +
+                        '<th>التواريخ المسجلة</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + summaryRows + '</tbody>' +
+            '</table><br/><br/>' +
+            '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="13" class="wp-title">ثانياً: جدول نشاطات الشعب التفصيلي الكامل حسب الأشهر</th></tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th>الشعبة / مكان العمل</th>' +
+                        '<th style="width:70px;">الشهر</th>' +
+                        '<th style="width:60px;">السنة</th>' +
+                        '<th>الموظف المرسل</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th style="width:85px;">المشتركين</th>' +
+                        '<th>جهة التنفيذ</th>' +
+                        '<th>الجهة المستهدفة</th>' +
+                        '<th>المرفقات</th>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + detailedRows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'التقرير_التراكمي_الكامل_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        function exportExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const records = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+            if (!records.length) { showNotification('لا توجد بيانات!', 'error'); return; }
+
+            let rows = '';
+            records.forEach(r => {
+                if (r.activities) {
+                    r.activities.forEach(a => {
+                        rows += '<tr>' +
+                            '<td>' + escapeHtml(r.date || '') + '</td>' +
+                            '<td><strong>' + escapeHtml(r.employee || '') + '</strong></td>' +
+                            '<td>' + escapeHtml(r.workplace || '') + '</td>' +
+                            '<td>' + escapeHtml(r.month || '') + '</td>' +
+                            '<td>' + escapeHtml(r.year || '') + '</td>' +
+                            '<td style="font-weight:bold; color:#1e3c72;">' + escapeHtml(a.name || '') + '</td>' +
+                            '<td class="text-right">' + escapeHtml(a.details || '') + '</td>' +
+                            '<td class="num">' + (parseInt(a.participants) || 0) + '</td>' +
+                        '</tr>';
+                    });
+                }
+            });
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="8" class="main-title">سجل التقارير المحفوظة</th></tr>' +
+                    '<tr>' +
+                        '<th>التاريخ</th>' +
+                        '<th>الموظف</th>' +
+                        '<th>مكان العمل</th>' +
+                        '<th>الشهر</th>' +
+                        '<th>السنة</th>' +
+                        '<th>النشاط</th>' +
+                        '<th>التفاصيل</th>' +
+                        '<th>المشتركين</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            downloadExcelTable(html, 'تقرير_السجلات_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        function showNotification(msg, type) {
+            const n = document.getElementById('notification');
+            n.textContent = msg;
+            n.className = 'notification ' + type;
+            n.style.display = 'block';
+            setTimeout(() => n.style.display = 'none', 4000);
+        }
+
+        function exportFormJSON() {
+            const data = getFormData();
+            if (!data.m || !data.y || !data.e || !data.w) { showNotification('املأ البيانات المطلوبة أولاً!', 'error'); return; }
+            if (data.acts.length === 0) { showNotification('أضف نشاطاً واحداً على الأقل!', 'error'); return; }
+            
+            const record = {
+                id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+                timestamp: Date.now(),
+                date: new Date().toLocaleString('ar-IQ'),
+                month: data.m,
+                year: data.y,
+                employee: data.e,
+                workplace: data.w,
+                activities: data.acts,
+                savedBy: currentUser || 'user'
+            };
+            
+            const blob = new Blob([JSON.stringify(record, null, 2)], { type: 'application/json;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `استمارة_${record.employee}_${record.month}_${record.year}.json`;
+            link.click();
+            showNotification('تم تصدير ملف بيانات الاستمارة بنجاح', 'success');
+        }
+
+        function triggerImportJSON() {
+            document.getElementById('importJsonInput').click();
+        }
+
+        async function importFormJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    const importedRecord = JSON.parse(e.target.result);
+                    if (!importedRecord.id || !importedRecord.employee || !importedRecord.activities) {
+                        throw new Error('ملف غير صالح');
+                    }
+                    
+                    // دمج السجل محلياً
+                    let localRecords = JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+                    const existsIdx = localRecords.findIndex(r => r.id === importedRecord.id);
+                    if (existsIdx !== -1) {
+                        localRecords[existsIdx] = importedRecord;
+                    } else {
+                        localRecords.push(importedRecord);
+                    }
+                    localStorage.setItem('sharedRecords', JSON.stringify(localRecords));
+                    
+                    // مزامنة مع السيرفر المحلي أو جوجل شيت إذا كان متصلاً
+                    let scriptUrl = localStorage.getItem('googleScriptUrl') || DEFAULT_GOOGLE_SCRIPT_URL;
+                    if (scriptUrl && scriptUrl !== 'ضع_رابط_جوجل_شيت_هنا') {
+                        sendToGoogleSheets(importedRecord);
+                    }
+                    
+                    showNotification('تم استيراد استمارة الموظف: ' + importedRecord.employee + ' بنجاح', 'success');
+                    loadReports(true);
+                    if (typeof loadCumulativeReport === 'function') {
+                        loadCumulativeReport(true);
+                    }
+                } catch (err) {
+                    console.error('Error importing JSON:', err);
+                    showNotification('خطأ: الملف المختار غير صالح أو تالف!', 'error');
+                }
+                event.target.value = ''; // إعادة تعيين
+            };
+            reader.readAsText(file);
+        }
+
+        window.addEventListener('load', function() {
+            // تنظيف الرابط القديم من localStorage لضمان تفعيل الرابط الجديد كافتراضي تلقائياً للمستخدم
+            const oldDefault = 'https://script.google.com/macros/s/AKfycbzlDjh4SVBEnaRA6_eWXhCyYwfzx4_SDcwpTnpsxnXveOo-E-AO4pocYvMDGsF5S-xo/exec';
+            if (localStorage.getItem('googleScriptUrl') === oldDefault) {
+                localStorage.removeItem('googleScriptUrl');
+            }
+
+            initializeDefaultUsers();
+            
+            // جلب ومزامنة الحسابات والسجلات في الخلفية فور فتح الصفحة
+            fetchFromGoogleSheets(true).then(() => {
+                // إذا تم تحديث الحسابات، أعد تحميل جدول المستخدمين في حال كان الأدمن فاتحاً للوحة التحكم
+                if (currentUserRole === 'admin' && document.getElementById('adminPage').classList.contains('active')) {
+                    loadUsers();
+                }
+            }).catch(e => console.error("Error loading initial data:", e));
+
+            const savedUser = localStorage.getItem('currentUser');
+            const savedRole = localStorage.getItem('currentUserRole');
+            if (savedUser && savedRole && getUsers()[savedUser]) {
+                currentUser = savedUser; currentUserRole = savedRole;
+                document.getElementById('userDisplay').textContent = savedUser;
+                if (currentUserRole === 'admin') {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="admin-badge">أدمن</span>';
+                    document.getElementById('navAdminBtn').style.display = 'inline-block';
+                } else {
+                    document.getElementById('userRoleBadge').innerHTML = '<span class="role-badge user">مستخدم</span>';
+                    document.getElementById('navAdminBtn').style.display = 'none';
+                }
+                document.getElementById('mainNavbar').classList.add('show');
+                showPage('formPage');
+                if (rowCount === 0) addRow();
+                loadReports();
+            }
+        });
+    </script>
+</body>
+</html>

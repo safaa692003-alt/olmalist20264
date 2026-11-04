@@ -95,6 +95,13 @@
         .export-btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; color: #fff; }
         .export-btn.pdf { background: #e74c3c; }
         .export-btn.excel { background: #27ae60; }
+        .export-btn.word { background: #2980b9; }
+        .admin-annual-table thead { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        .admin-annual-table th { padding: 10px 8px; color: #fff; font-size: 12px; }
+        .admin-annual-table td { padding: 9px 8px; border-bottom: 1px solid #e0e0e0; font-size: 12px; vertical-align: middle; }
+        .admin-annual-table .wp-head-row td { background: #1e3c72 !important; color: #ffffff !important; font-weight: bold; font-size: 13px; padding: 10px 14px; text-align: right; }
+        .admin-annual-table .subtotal-row td { background: #f0f4f8 !important; font-weight: bold; font-size: 12px; border-top: 1px solid #ccd7e6; border-bottom: 2px solid #1e3c72; }
+        .admin-annual-table .grandtotal-row td { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; color: #ffffff !important; font-weight: bold; font-size: 13px; padding: 12px 14px; }
         .export-btn.print { background: #3498db; }
         .export-btn.refresh { background: #9b59b6; }
         .reports-table-wrapper { overflow-x: auto; border-radius: 8px; }
@@ -528,6 +535,102 @@
                         <tbody id="usersTableBody"></tbody>
                     </table>
                 </div>
+                <!-- ========================================================================= -->
+                <!-- تقرير النشاطات السنوي الموحد لجميع الشعب (جدول موحد مقسم حسب الشعب)      -->
+                <!-- ========================================================================= -->
+                <div class="admin-annual-report-section" style="margin-top: 35px; border-top: 3px double #1e3c72; padding-top: 25px;">
+                    <div class="form-section-title" style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                        <div>
+                            <h2 style="font-size: 18px; margin:0;">📊 تقرير النشاطات السنوي الموحد لجميع الشعب (جدول موحد ومقسم حسب الشعب)</h2>
+                            <p style="font-size: 12px; margin: 4px 0 0 0; opacity: 0.95; color: #f1c40f;">جدول سنوي موحد يجمع النشاطات المتشابهة لكل شعبة بعدد واحد وإجمالي المشتركين طيلة العام</p>
+                        </div>
+                    </div>
+
+                    <!-- بطاقات الإحصائيات السنوية الموحدة -->
+                    <div class="admin-stats" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 20px;">
+                        <div class="admin-stat-card" style="border-right-color: #1e3c72; background: linear-gradient(135deg, #eef2f7 0%, #dbe4ee 100%);">
+                            <div class="stat-value" id="annualTotalWorkplaces">0</div>
+                            <div class="stat-label">عدد الشعب / الأقسام</div>
+                        </div>
+                        <div class="admin-stat-card" style="border-right-color: #8e44ad; background: linear-gradient(135deg, #f5eef8 0%, #ebdef0 100%);">
+                            <div class="stat-value" id="annualTotalUniqueActivities">0</div>
+                            <div class="stat-label">النشاطات الموحدة الفريدة</div>
+                        </div>
+                        <div class="admin-stat-card" style="border-right-color: #2980b9; background: linear-gradient(135deg, #ebf5fb 0%, #d4e6f1 100%);">
+                            <div class="stat-value" id="annualTotalOccurrences">0</div>
+                            <div class="stat-label">إجمالي التكرار (عدد النشاطات في السنة)</div>
+                        </div>
+                        <div class="admin-stat-card" style="border-right-color: #27ae60; background: linear-gradient(135deg, #eafaf1 0%, #d5f5e3 100%);">
+                            <div class="stat-value" id="annualTotalParticipants">0</div>
+                            <div class="stat-label">إجمالي المتدربين / المشاركين</div>
+                        </div>
+                    </div>
+
+                    <!-- شريط الفلترة وأزرار الحفظ (Excel و Word والطباعة والتحديث) -->
+                    <div style="background:#f8f9fa; border:1px solid #dcdde1; border-radius:10px; padding:15px; margin-bottom:15px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <label style="font-size:12px; font-weight:bold; color:#1e3c72; margin:0;">السنة:</label>
+                                <select id="adminAnnualFilterYear" onchange="renderAdminAnnualReport()" style="padding:6px 12px; border:2px solid #1e3c72; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                                    <option value="">جميع السنوات</option>
+                                    <option value="2026" selected>2026</option>
+                                    <option value="2027">2027</option>
+                                    <option value="2028">2028</option>
+                                    <option value="2029">2029</option>
+                                    <option value="2030">2030</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <label style="font-size:12px; font-weight:bold; color:#1e3c72; margin:0;">الشعبة:</label>
+                                <select id="adminAnnualFilterWorkplace" onchange="renderAdminAnnualReport()" style="padding:6px 12px; border:2px solid #1e3c72; border-radius:6px; font-size:12px; background:#fff; color:#333;">
+                                    <option value="">جميع الشعب / أماكن العمل</option>
+                                    <option value="مدير القسم">مدير القسم</option>
+                                    <option value="معاون مدير القسم">معاون مدير القسم</option>
+                                    <option value="مكتب رئيس القسم">مكتب رئيس القسم</option>
+                                    <option value="شعبة التدريب">شعبة التدريب</option>
+                                    <option value="شعبة المعاهد">شعبة المعاهد</option>
+                                    <option value="شعبة البحوث والدراسات">شعبة البحوث والدراسات</option>
+                                    <option value="شعبة الاشغال اليدوية">شعبة الاشغال اليدوية</option>
+                                    <option value="وحدة اللغة العربية">وحدة اللغة العربية</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <input type="text" id="adminAnnualSearch" oninput="renderAdminAnnualReport()" placeholder="🔍 بحث في اسم النشاط أو الشعبة..." style="padding:6px 12px; border:2px solid #1e3c72; border-radius:6px; font-size:12px; min-width:200px; background:#fff;">
+                            </div>
+                        </div>
+
+                        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                            <button class="export-btn excel" onclick="exportAdminAnnualExcel()" style="background:#27ae60; font-weight:bold; font-size:12px; padding:7px 15px; display:inline-flex; align-items:center; gap:5px;">📥 حفظ كملف Excel</button>
+                            <button class="export-btn word" onclick="exportAdminAnnualWord()" style="background:#2980b9; font-weight:bold; font-size:12px; padding:7px 15px; display:inline-flex; align-items:center; gap:5px;">📄 حفظ كملف Word</button>
+                            <button class="export-btn print" onclick="printAdminAnnualReport()" style="background:#34495e; font-weight:bold; font-size:12px; padding:7px 15px; display:inline-flex; align-items:center; gap:5px;">🖨️ طباعة</button>
+                            <button class="export-btn refresh" onclick="loadAdminAnnualReport(true)" style="background:#8e44ad; font-weight:bold; font-size:12px; padding:7px 15px; display:inline-flex; align-items:center; gap:5px;">🔄 تحديث</button>
+                        </div>
+                    </div>
+
+                    <!-- الحاوية للجدول الواحد الموحد -->
+                    <div class="reports-table-wrapper" style="border: 2px solid #1e3c72; border-radius: 8px; overflow-x: auto; box-shadow: 0 3px 10px rgba(0,0,0,0.06);">
+                        <table class="reports-table admin-annual-table" id="adminAnnualReportTable" style="margin-bottom:0; min-width:1100px;">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px; text-align:center;">ت</th>
+                                    <th style="width:140px; text-align:center;">الشعبة / مكان العمل</th>
+                                    <th style="text-align:right;">اسم النشاط</th>
+                                    <th style="width:130px; text-align:center;">عدد النشاطات طيلة العام</th>
+                                    <th style="width:140px; text-align:center;">إجمالي المتدربين / المشاركين</th>
+                                    <th style="width:130px; text-align:center;">جهة التنفيذ</th>
+                                    <th style="width:130px; text-align:center;">الجهة المستهدفة</th>
+                                    <th style="width:140px; text-align:center;">الأشهر المنفذة</th>
+                                    <th style="text-align:right;">أبرز التفاصيل والملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminAnnualReportTableBody">
+                                <tr><td colspan="9" style="text-align:center; padding:30px;">جاري تحميل بيانات التقرير السنوي الموحد...</td></tr>
+                            </tbody>
+                            <tfoot id="adminAnnualReportTableFoot">
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -756,7 +859,7 @@
             if (pageId === 'formPage') { document.getElementById('navFormBtn').classList.add('active'); updateUserNotice(); }
             else if (pageId === 'reportsPage') { document.getElementById('navReportsBtn').classList.add('active'); loadReports(); }
             else if (pageId === 'cumulativePage') { document.getElementById('navCumulativeBtn').classList.add('active'); setTimeout(() => loadCumulativeReport(), 50); }
-            else if (pageId === 'adminPage') { document.getElementById('navAdminBtn').classList.add('active'); loadUsers(); }
+            else if (pageId === 'adminPage') { document.getElementById('navAdminBtn').classList.add('active'); loadUsers(); loadAdminAnnualReport(); }
         }
 
         function updateUserNotice() {
@@ -1574,6 +1677,7 @@
             
             cachedCumulativeRecords = await fetchFromGoogleSheets(forceRefresh);
             renderCumulativeTables();
+            if (typeof renderAdminAnnualReport === 'function') renderAdminAnnualReport();
         }
 
         function renderCumulativeTables() {
@@ -2310,6 +2414,629 @@
             '</table>';
 
             downloadExcelTable(html, 'حسابات_المستخدمين_' + new Date().toISOString().split('T')[0] + '.xls');
+        }
+
+        // =========================================================================
+        // تقرير النشاطات السنوي الموحد في لوحة التحكم (جدول موحد مقسم حسب الشعب)
+        // =========================================================================
+
+        async function loadAdminAnnualReport(forceRefresh = false) {
+            const tbody = document.getElementById('adminAnnualReportTableBody');
+            if (tbody) tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:30px;">⏳ جاري جلب وتجميع بيانات التقرير السنوي...</td></tr>';
+            
+            try {
+                if (forceRefresh || !cachedCumulativeRecords || cachedCumulativeRecords.length === 0) {
+                    cachedCumulativeRecords = await fetchFromGoogleSheets(forceRefresh);
+                }
+            } catch (err) {
+                console.error("Error loading admin annual data:", err);
+            }
+            renderAdminAnnualReport();
+        }
+
+        function getFilteredAdminAnnualData() {
+            const filterYear = document.getElementById('adminAnnualFilterYear') ? document.getElementById('adminAnnualFilterYear').value : '';
+            const filterWorkplace = document.getElementById('adminAnnualFilterWorkplace') ? document.getElementById('adminAnnualFilterWorkplace').value : '';
+            const searchQuery = (document.getElementById('adminAnnualSearch') ? document.getElementById('adminAnnualSearch').value : '').trim().toLowerCase();
+
+            const allRecords = (cachedCumulativeRecords && cachedCumulativeRecords.length)
+                ? cachedCumulativeRecords
+                : JSON.parse(localStorage.getItem('sharedRecords') || '[]');
+
+            const records = allRecords.filter(r => {
+                if (filterYear && (r.year || '').toString() !== filterYear.toString()) return false;
+                if (filterWorkplace && (r.workplace || '') !== filterWorkplace) return false;
+                return true;
+            });
+
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            const workplacesMap = {};
+
+            records.forEach(r => {
+                const wp = (r.workplace || 'غير محدد').trim();
+                if (!workplacesMap[wp]) {
+                    workplacesMap[wp] = {
+                        workplace: wp,
+                        activitiesMap: {},
+                        totalOccurrences: 0,
+                        totalParticipants: 0,
+                        employees: new Set()
+                    };
+                }
+                if (r.employee) workplacesMap[wp].employees.add(r.employee);
+
+                if (r.activities && Array.isArray(r.activities)) {
+                    r.activities.forEach(a => {
+                        const actName = (a.name || '').trim();
+                        if (!actName) return;
+
+                        if (!workplacesMap[wp].activitiesMap[actName]) {
+                            workplacesMap[wp].activitiesMap[actName] = {
+                                name: actName,
+                                workplace: wp,
+                                count: 0,
+                                participants: 0,
+                                executors: new Set(),
+                                targets: new Set(),
+                                months: new Set(),
+                                dates: new Set(),
+                                details: new Set(),
+                                notes: new Set()
+                            };
+                        }
+
+                        const actObj = workplacesMap[wp].activitiesMap[actName];
+                        actObj.count += 1;
+                        const p = parseInt(a.participants) || 0;
+                        actObj.participants += p;
+                        workplacesMap[wp].totalOccurrences += 1;
+                        workplacesMap[wp].totalParticipants += p;
+
+                        if (a.executor && a.executor.trim()) actObj.executors.add(a.executor.trim());
+                        if (a.target && a.target.trim()) actObj.targets.add(a.target.trim());
+                        if (r.month && r.month.trim()) actObj.months.add(r.month.trim());
+                        if (a.date && a.date.trim()) actObj.dates.add(a.date.trim());
+                        if (a.details && a.details.trim()) actObj.details.add(a.details.trim());
+                        if (a.notes && a.notes.trim()) actObj.notes.add(a.notes.trim());
+                    });
+                }
+            });
+
+            // فلترة وتطبيق البحث إذا وجد
+            const filteredWorkplaces = [];
+            let grandOccurrences = 0;
+            let grandParticipants = 0;
+            let totalUniqueActivities = 0;
+
+            Object.keys(workplacesMap).forEach(wp => {
+                const wpObj = workplacesMap[wp];
+                let acts = Object.values(wpObj.activitiesMap);
+
+                if (searchQuery) {
+                    acts = acts.filter(a => {
+                        return a.name.toLowerCase().includes(searchQuery) ||
+                               wp.toLowerCase().includes(searchQuery) ||
+                               [...a.executors].some(x => x.toLowerCase().includes(searchQuery)) ||
+                               [...a.targets].some(x => x.toLowerCase().includes(searchQuery)) ||
+                               [...a.details].some(x => x.toLowerCase().includes(searchQuery)) ||
+                               [...a.notes].some(x => x.toLowerCase().includes(searchQuery));
+                    });
+                }
+
+                if (acts.length > 0) {
+                    // ترتيب النشاطات حسب تكرارها تنازلياً
+                    acts.sort((a, b) => b.count - a.count);
+
+                    const occurrences = acts.reduce((s, a) => s + a.count, 0);
+                    const participants = acts.reduce((s, a) => s + a.participants, 0);
+
+                    grandOccurrences += occurrences;
+                    grandParticipants += participants;
+                    totalUniqueActivities += acts.length;
+
+                    filteredWorkplaces.push({
+                        workplace: wp,
+                        activities: acts,
+                        occurrences: occurrences,
+                        participants: participants,
+                        employeesCount: wpObj.employees.size
+                    });
+                }
+            });
+
+            return {
+                workplaces: filteredWorkplaces,
+                totalWorkplaces: filteredWorkplaces.length,
+                totalUniqueActivities: totalUniqueActivities,
+                grandOccurrences: grandOccurrences,
+                grandParticipants: grandParticipants,
+                selectedYear: filterYear,
+                selectedWorkplace: filterWorkplace,
+                searchQuery: searchQuery
+            };
+        }
+
+        function renderAdminAnnualReport() {
+            const tbody = document.getElementById('adminAnnualReportTableBody');
+            const tfoot = document.getElementById('adminAnnualReportTableFoot');
+            if (!tbody) return;
+
+            const data = getFilteredAdminAnnualData();
+
+            // تحديث بطاقات الإحصائيات
+            const wpEl = document.getElementById('annualTotalWorkplaces');
+            const actsEl = document.getElementById('annualTotalUniqueActivities');
+            const occEl = document.getElementById('annualTotalOccurrences');
+            const partEl = document.getElementById('annualTotalParticipants');
+
+            if (wpEl) wpEl.textContent = data.totalWorkplaces;
+            if (actsEl) actsEl.textContent = data.totalUniqueActivities;
+            if (occEl) occEl.textContent = data.grandOccurrences;
+            if (partEl) partEl.textContent = data.grandParticipants.toLocaleString('ar-IQ');
+
+            if (data.workplaces.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:35px; color:#777; font-size:13px;">لا توجد نشاطات مسجلة مطابقة للسنة أو الشعبة المحددة</td></tr>';
+                if (tfoot) { tfoot.innerHTML = ''; tfoot.style.display = 'none'; }
+                return;
+            }
+
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            let html = '';
+            let globalCounter = 1;
+
+            data.workplaces.forEach(wpObj => {
+                const wp = wpObj.workplace;
+                // صف ترويسة مقسمة لكل شعبة داخل نفس الجدول الواحد
+                html += '<tr class="wp-head-row">' +
+                    '<td colspan="9" style="background:#1e3c72 !important; color:#fff !important; font-weight:bold; font-size:13px; text-align:right; padding:10px 14px;">' +
+                        '🏢 شعبة: <span style="color:gold;">' + escapeHtml(wp) + '</span>' +
+                        '<span style="float:left; font-size:11.5px; font-weight:normal; display:inline-flex; gap:10px; align-items:center;">' +
+                            '<span style="background:rgba(255,255,255,0.18); padding:3px 8px; border-radius:5px;">أنشطة موحدة: <strong>' + wpObj.activities.length + '</strong></span>' +
+                            '<span style="background:rgba(52,152,219,0.85); padding:3px 8px; border-radius:5px;">إجمالي التكرار طيلة العام: <strong>' + wpObj.occurrences + '</strong></span>' +
+                            '<span style="background:rgba(39,174,96,0.85); padding:3px 8px; border-radius:5px;">إجمالي المتدربين: <strong>' + wpObj.participants.toLocaleString('ar-IQ') + '</strong></span>' +
+                        '</span>' +
+                    '</td>' +
+                '</tr>' +
+                '<tr style="background:#2c3e50; color:#fff;">' +
+                    '<th style="width:40px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">ت</th>' +
+                    '<th style="width:140px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">الشعبة / مكان العمل</th>' +
+                    '<th style="text-align:right; padding:8px 8px; font-size:11.5px; color:#fff; background:#2c3e50;">اسم النشاط</th>' +
+                    '<th style="width:130px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">عدد النشاطات في السنة (التكرار)</th>' +
+                    '<th style="width:140px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">إجمالي المتدربين / المشاركين</th>' +
+                    '<th style="width:120px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">جهة التنفيذ</th>' +
+                    '<th style="width:120px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">الجهة المستهدفة</th>' +
+                    '<th style="width:130px; text-align:center; padding:8px 5px; font-size:11.5px; color:#fff; background:#2c3e50;">الأشهر المنفذة</th>' +
+                    '<th style="text-align:right; padding:8px 8px; font-size:11.5px; color:#fff; background:#2c3e50;">أبرز التفاصيل والملاحظات</th>' +
+                '</tr>';
+
+                wpObj.activities.forEach(act => {
+                    const sortedMonths = [...act.months].sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+                    const monthsText = sortedMonths.length ? sortedMonths.join(' ، ') : ([...act.dates].join(' ، ') || '-');
+                    const executorsText = [...act.executors].join(' ، ') || '-';
+                    const targetsText = [...act.targets].join(' ، ') || '-';
+                    
+                    let detailsArr = [...act.details].filter(Boolean);
+                    let notesArr = [...act.notes].filter(Boolean);
+                    let summaryText = '';
+                    if (detailsArr.length) summaryText += detailsArr.join(' | ');
+                    if (notesArr.length) {
+                        if (summaryText) summaryText += ' — ';
+                        summaryText += 'ملاحظات: ' + notesArr.join(' | ');
+                    }
+                    if (!summaryText) summaryText = '-';
+
+                    html += '<tr>' +
+                        '<td style="text-align:center; font-weight:bold; color:#555;">' + (globalCounter++) + '</td>' +
+                        '<td style="text-align:center; font-weight:bold; color:#2c3e50;">' + escapeHtml(wp) + '</td>' +
+                        '<td style="text-align:right;"><strong style="color:#1e3c72; font-size:13px;">' + escapeHtml(act.name) + '</strong></td>' +
+                        '<td style="text-align:center;"><span class="activity-count" style="background:#1e3c72; font-weight:bold; font-size:11.5px; padding:4px 10px;">' + act.count + ' ' + (act.count === 1 ? 'مرة' : 'مرات') + '</span></td>' +
+                        '<td style="text-align:center;"><span class="participants-sum" style="font-size:13px; font-weight:bold; color:#27ae60;">' + act.participants.toLocaleString('ar-IQ') + ' متدرب/مشارك</span></td>' +
+                        '<td style="text-align:center;">' + escapeHtml(executorsText) + '</td>' +
+                        '<td style="text-align:center;">' + escapeHtml(targetsText) + '</td>' +
+                        '<td style="text-align:center; font-size:11px; color:#555;">' + escapeHtml(monthsText) + '</td>' +
+                        '<td style="text-align:right; font-size:11.5px; max-width:280px; white-space:pre-wrap;">' + escapeHtml(summaryText) + '</td>' +
+                    '</tr>';
+                });
+
+                // صف مجموع الشعبة (Subtotal)
+                html += '<tr class="subtotal-row" style="background:#f4f7fb; font-weight:bold; border-top:1px solid #ccd7e6; border-bottom:2px solid #1e3c72;">' +
+                    '<td colspan="3" style="text-align:left; color:#1e3c72; padding:8px 12px; font-size:12px;">مجموع شعبة (' + escapeHtml(wp) + '):</td>' +
+                    '<td style="text-align:center; color:#1e3c72; font-size:13px;"><span class="activity-count" style="background:#1e3c72;">' + wpObj.occurrences + ' نشاط</span></td>' +
+                    '<td style="text-align:center; color:#27ae60; font-size:13px;"><span class="participants-sum">' + wpObj.participants.toLocaleString('ar-IQ') + ' متدرب/مشارك</span></td>' +
+                    '<td colspan="4" style="text-align:right; font-size:11.5px; color:#666; padding:8px 12px;">عدد الأنشطة الموحدة في هذه الشعبة: ' + wpObj.activities.length + '</td>' +
+                '</tr>';
+            });
+
+            tbody.innerHTML = html;
+
+            // بناء المجموع الكلي العام في tfoot
+            if (tfoot) {
+                tfoot.style.display = 'table-footer-group';
+                tfoot.innerHTML = '<tr class="grandtotal-row" style="background:linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color:#fff; font-weight:bold; font-size:13px;">' +
+                    '<td colspan="3" style="text-align:left; padding:12px 14px; color:#fff;">المجموع الكلي العام لجميع الشعب:</td>' +
+                    '<td style="text-align:center; padding:12px; color:#f1c40f; font-size:14px;">' + data.grandOccurrences + ' نشاط</td>' +
+                    '<td style="text-align:center; padding:12px; color:#2ecc71; font-size:14px;">' + data.grandParticipants.toLocaleString('ar-IQ') + ' متدرب/مشارك</td>' +
+                    '<td colspan="4" style="text-align:right; padding:12px 14px; font-size:12px; color:#ecf0f1;">عدد الشعب: ' + data.totalWorkplaces + ' | إجمالي الأنشطة الموحدة: ' + data.totalUniqueActivities + '</td>' +
+                '</tr>';
+            }
+        }
+
+        // =========================================================================
+        // تصدير التقرير السنوي كملف Excel (.xls)
+        // =========================================================================
+        function exportAdminAnnualExcel() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredAdminAnnualData();
+            if (!data.workplaces.length) { showNotification('لا توجد بيانات لتصديرها!', 'error'); return; }
+
+            const yearLabel = data.selectedYear ? ('لسنة ' + data.selectedYear) : 'طيلة العام (جميع السنوات)';
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+            let rows = '';
+            let counter = 1;
+
+            data.workplaces.forEach(wpObj => {
+                const wp = wpObj.workplace;
+                // ترويسة الشعبة ورأس جدول الشعبة
+                rows += '<tr>' +
+                    '<th colspan="9" class="wp-title" style="text-align:right; font-size:12pt; background-color:#1e3c72; color:#ffffff; padding:8px;">' +
+                        '🏢 شعبة: ' + escapeHtml(wp) + ' (إجمالي الأنشطة الموحدة: ' + wpObj.activities.length + ' | إجمالي التكرار: ' + wpObj.occurrences + ' | إجمالي المتدربين: ' + wpObj.participants + ')' +
+                    '</th>' +
+                '</tr>' +
+                '<tr>' +
+                    '<th style="width:40px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">ت</th>' +
+                    '<th style="width:140px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">الشعبة / مكان العمل</th>' +
+                    '<th style="background-color:#2c3e50; color:#ffffff; font-size:11pt;">اسم النشاط</th>' +
+                    '<th style="width:130px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">عدد النشاطات في السنة (التكرار)</th>' +
+                    '<th style="width:140px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">إجمالي المتدربين / المشاركين</th>' +
+                    '<th style="width:120px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">جهة التنفيذ</th>' +
+                    '<th style="width:120px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">الجهة المستهدفة</th>' +
+                    '<th style="width:130px; background-color:#2c3e50; color:#ffffff; font-size:11pt;">الأشهر المنفذة</th>' +
+                    '<th style="background-color:#2c3e50; color:#ffffff; font-size:11pt;">أبرز التفاصيل والملاحظات</th>' +
+                '</tr>';
+
+                wpObj.activities.forEach(act => {
+                    const sortedMonths = [...act.months].sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+                    const monthsText = sortedMonths.length ? sortedMonths.join(' ، ') : ([...act.dates].join(' ، ') || '-');
+                    const executorsText = [...act.executors].join(' ، ') || '-';
+                    const targetsText = [...act.targets].join(' ، ') || '-';
+
+                    let detailsArr = [...act.details].filter(Boolean);
+                    let notesArr = [...act.notes].filter(Boolean);
+                    let summaryText = '';
+                    if (detailsArr.length) summaryText += detailsArr.join(' | ');
+                    if (notesArr.length) {
+                        if (summaryText) summaryText += ' — ';
+                        summaryText += 'ملاحظات: ' + notesArr.join(' | ');
+                    }
+                    if (!summaryText) summaryText = '-';
+
+                    rows += '<tr>' +
+                        '<td class="num">' + (counter++) + '</td>' +
+                        '<td>' + escapeHtml(wp) + '</td>' +
+                        '<td style="font-weight:bold; color:#1e3c72; text-align:right;">' + escapeHtml(act.name) + '</td>' +
+                        '<td class="num">' + act.count + '</td>' +
+                        '<td class="num">' + act.participants + '</td>' +
+                        '<td>' + escapeHtml(executorsText) + '</td>' +
+                        '<td>' + escapeHtml(targetsText) + '</td>' +
+                        '<td>' + escapeHtml(monthsText) + '</td>' +
+                        '<td class="text-right">' + escapeHtml(summaryText) + '</td>' +
+                    '</tr>';
+                });
+
+                // صف مجموع الشعبة
+                rows += '<tr>' +
+                    '<th colspan="3" style="text-align:left; background-color:#f4ecf7; color:#1e3c72; font-weight:bold;">مجموع شعبة (' + escapeHtml(wp) + '):</th>' +
+                    '<td class="stat-val num" style="background-color:#f4ecf7; color:#1e3c72;">' + wpObj.occurrences + '</td>' +
+                    '<td class="stat-val num" style="background-color:#f4ecf7; color:#27ae60;">' + wpObj.participants + '</td>' +
+                    '<td colspan="4" style="background-color:#f4ecf7; text-align:right; font-size:10pt;">عدد الأنشطة: ' + wpObj.activities.length + '</td>' +
+                '</tr>';
+            });
+
+            // صف المجموع الكلي العام
+            rows += '<tr>' +
+                '<th colspan="3" class="main-title" style="text-align:left; background-color:#1e3c72; font-size:12pt;">المجموع الكلي العام لجميع الشعب:</th>' +
+                '<th class="main-title num" style="background-color:#1e3c72; font-size:13pt; color:#f1c40f;">' + data.grandOccurrences + '</th>' +
+                '<th class="main-title num" style="background-color:#1e3c72; font-size:13pt; color:#2ecc71;">' + data.grandParticipants + '</th>' +
+                '<th colspan="4" class="main-title" style="text-align:right; background-color:#1e3c72; font-size:11pt;">عدد الشعب: ' + data.totalWorkplaces + ' | إجمالي الأنشطة الموحدة: ' + data.totalUniqueActivities + '</th>' +
+            '</tr>';
+
+            const html = '<table>' +
+                '<thead>' +
+                    '<tr><th colspan="9" class="main-title">وزارة التربية - المديرية العامة لتربية المثنى - قسم الإعداد والتدريب</th></tr>' +
+                    '<tr><th colspan="9" class="sub-title">التقرير السنوي الموحد لجميع النشاطات ' + escapeHtml(yearLabel) + ' (جدول موحد مقسم حسب الشعب)</th></tr>' +
+                    '<tr>' +
+                        '<th class="stat-lbl" colspan="2">إجمالي الشعب المشمولة</th><td class="stat-val num">' + data.totalWorkplaces + '</td>' +
+                        '<th class="stat-lbl">إجمالي الأنشطة الموحدة</th><td class="stat-val num">' + data.totalUniqueActivities + '</td>' +
+                        '<th class="stat-lbl">إجمالي التكرار السنوي</th><td class="stat-val num">' + data.grandOccurrences + '</td>' +
+                        '<th class="stat-lbl">إجمالي المتدربين</th><td class="stat-val num">' + data.grandParticipants + '</td>' +
+                    '</tr>' +
+                    '<tr>' +
+                        '<th style="width:40px;">ت</th>' +
+                        '<th style="width:130px;">الشعبة / مكان العمل</th>' +
+                        '<th>اسم النشاط</th>' +
+                        '<th style="width:120px;">عدد النشاطات في السنة (التكرار)</th>' +
+                        '<th style="width:130px;">إجمالي المتدربين / المشاركين</th>' +
+                        '<th style="width:120px;">جهة التنفيذ</th>' +
+                        '<th style="width:120px;">الجهة المستهدفة</th>' +
+                        '<th style="width:130px;">الأشهر المنفذة</th>' +
+                        '<th>أبرز التفاصيل والملاحظات</th>' +
+                    '</tr>' +
+                '</thead>' +
+                '<tbody>' + rows + '</tbody>' +
+            '</table>';
+
+            const fileName = 'التقرير_السنوي_الموحد_للنشاطات_' + (data.selectedYear || 'جميع_السنوات') + '.xls';
+            downloadExcelTable(html, fileName);
+        }
+
+        // =========================================================================
+        // تصدير التقرير السنوي كملف Word (.doc)
+        // =========================================================================
+        function exportAdminAnnualWord() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredAdminAnnualData();
+            if (!data.workplaces.length) { showNotification('لا توجد بيانات لتصديرها!', 'error'); return; }
+
+            const yearLabel = data.selectedYear ? ('لسنة ' + data.selectedYear) : 'طيلة العام (جميع السنوات)';
+            const today = new Date();
+            const todayStr = today.getFullYear() + '/' + String(today.getMonth() + 1).padStart(2, '0') + '/' + String(today.getDate()).padStart(2, '0');
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+
+            let rowsHtml = '';
+            let counter = 1;
+
+            data.workplaces.forEach(wpObj => {
+                const wp = wpObj.workplace;
+                // ترويسة الشعبة ورأس جدول الشعبة
+                rowsHtml += '<tr>' +
+                    '<td colspan="9" class="wp-head">' +
+                        '🏢 شعبة: ' + escapeHtml(wp) + ' &nbsp;&nbsp;|&nbsp;&nbsp; عدد الأنشطة: ' + wpObj.activities.length + ' &nbsp;&nbsp;|&nbsp;&nbsp; إجمالي التكرار: ' + wpObj.occurrences + ' &nbsp;&nbsp;|&nbsp;&nbsp; إجمالي المتدربين: ' + wpObj.participants +
+                    '</td>' +
+                '</tr>' +
+                '<tr>' +
+                    '<th style="width:35px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">ت</th>' +
+                    '<th style="width:130px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">الشعبة / مكان العمل</th>' +
+                    '<th style="background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">اسم النشاط</th>' +
+                    '<th style="width:110px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">عدد النشاطات في السنة (التكرار)</th>' +
+                    '<th style="width:110px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">إجمالي المتدربين / المشاركين</th>' +
+                    '<th style="width:110px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">جهة التنفيذ</th>' +
+                    '<th style="width:110px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">الجهة المستهدفة</th>' +
+                    '<th style="width:120px; background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">الأشهر المنفذة</th>' +
+                    '<th style="background:#1e3c72; color:#ffffff; border:1px solid #000; padding:6px 4px; font-size:10pt;">أبرز التفاصيل والملاحظات</th>' +
+                '</tr>';
+
+                wpObj.activities.forEach(act => {
+                    const sortedMonths = [...act.months].sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+                    const monthsText = sortedMonths.length ? sortedMonths.join(' ، ') : ([...act.dates].join(' ، ') || '-');
+                    const executorsText = [...act.executors].join(' ، ') || '-';
+                    const targetsText = [...act.targets].join(' ، ') || '-';
+
+                    let detailsArr = [...act.details].filter(Boolean);
+                    let notesArr = [...act.notes].filter(Boolean);
+                    let summaryText = '';
+                    if (detailsArr.length) summaryText += detailsArr.join(' | ');
+                    if (notesArr.length) {
+                        if (summaryText) summaryText += ' — ';
+                        summaryText += 'ملاحظات: ' + notesArr.join(' | ');
+                    }
+                    if (!summaryText) summaryText = '-';
+
+                    rowsHtml += '<tr>' +
+                        '<td>' + (counter++) + '</td>' +
+                        '<td>' + escapeHtml(wp) + '</td>' +
+                        '<td style="text-align:right; font-weight:bold;">' + escapeHtml(act.name) + '</td>' +
+                        '<td style="font-weight:bold;">' + act.count + '</td>' +
+                        '<td style="font-weight:bold; color:#0e6251;">' + act.participants + '</td>' +
+                        '<td>' + escapeHtml(executorsText) + '</td>' +
+                        '<td>' + escapeHtml(targetsText) + '</td>' +
+                        '<td style="font-size:9pt;">' + escapeHtml(monthsText) + '</td>' +
+                        '<td style="text-align:right; font-size:9pt;">' + escapeHtml(summaryText) + '</td>' +
+                    '</tr>';
+                });
+
+                // صف مجموع الشعبة
+                rowsHtml += '<tr class="subtotal">' +
+                    '<td colspan="3" style="text-align:left; font-weight:bold;">مجموع شعبة (' + escapeHtml(wp) + '):</td>' +
+                    '<td style="font-weight:bold;">' + wpObj.occurrences + ' نشاط</td>' +
+                    '<td style="font-weight:bold; color:#0e6251;">' + wpObj.participants + ' متدرب</td>' +
+                    '<td colspan="4" style="text-align:right; font-size:9pt;">عدد الأنشطة الموحدة: ' + wpObj.activities.length + '</td>' +
+                '</tr>';
+            });
+
+            // صف المجموع الكلي العام
+            rowsHtml += '<tr class="grandtotal">' +
+                '<td colspan="3" style="text-align:left; font-weight:bold; padding:8px;">المجموع الكلي العام لجميع الشعب:</td>' +
+                '<td style="font-weight:bold; font-size:11pt; padding:8px;">' + data.grandOccurrences + ' نشاط</td>' +
+                '<td style="font-weight:bold; font-size:11pt; padding:8px;">' + data.grandParticipants + ' متدرب/مشارك</td>' +
+                '<td colspan="4" style="text-align:right; font-size:9.5pt; padding:8px;">عدد الشعب: ' + data.totalWorkplaces + ' | إجمالي الأنشطة الموحدة: ' + data.totalUniqueActivities + '</td>' +
+            '</tr>';
+
+            const wordDoc = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+                '<head><meta charset="UTF-8">' +
+                '<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom><w:DoNotOptimizeForBrowser/></w:WordDocument></xml><![endif]-->' +
+                '<style>' +
+                '@page { size: A4 landscape; margin: 1cm 1cm; }' +
+                'body { font-family: "Arial", "Tahoma", sans-serif; direction: rtl; font-size: 10pt; margin: 0; padding: 0; color: #000; background: #fff; }' +
+                '* { box-sizing: border-box; }' +
+                '.doc { padding: 4px; }' +
+                '.header { width: 100%; margin-bottom: 12px; }' +
+                '.header table { width: 100%; border-collapse: collapse; }' +
+                '.header td { vertical-align: middle; padding: 2px; border: none !important; }' +
+                '.header .right { text-align: right; width: 35%; font-size: 11pt; font-weight: bold; }' +
+                '.header .center { text-align: center; width: 30%; }' +
+                '.header .left { text-align: left; width: 35%; font-size: 11pt; font-weight: bold; }' +
+                '.header h1 { margin: 0; font-size: 13pt; color: #000; line-height: 1.4; }' +
+                '.header h2 { margin: 0; font-size: 11pt; color: #000; line-height: 1.4; font-weight: normal; }' +
+                '.logo { width: 65px; height: 65px; object-fit: contain; }' +
+                '.report-title-box { background: #1e3c72; color: #fff; text-align: center; padding: 7px 12px; margin-bottom: 12px; font-size: 12pt; font-weight: bold; }' +
+                '.info-table { width: 100%; border-collapse: collapse; margin-bottom: 15px; }' +
+                '.info-table td { border: 1px solid #7f8c8d; padding: 5px 8px; font-size: 10pt; text-align: center; }' +
+                '.info-table .lbl { background: #e8e8e8; font-weight: bold; }' +
+                '.info-table .val { font-weight: bold; color: #1e3c72; }' +
+                '.main-table { width: 100%; border-collapse: collapse; margin-bottom: 25px; }' +
+                '.main-table th { background: #1e3c72; color: #ffffff; border: 1px solid #000; padding: 6px 4px; font-size: 10pt; text-align: center; font-weight: bold; }' +
+                '.main-table td { border: 1px solid #000; padding: 5px 4px; font-size: 9.5pt; text-align: center; vertical-align: middle; }' +
+                '.main-table .wp-head { background: #2c3e50; color: #ffffff; font-weight: bold; font-size: 10.5pt; text-align: right; padding: 6px 10px; }' +
+                '.main-table .subtotal { background: #f0f4f8; font-weight: bold; }' +
+                '.main-table .grandtotal { background: #1e3c72; color: #ffffff; font-weight: bold; font-size: 10.5pt; }' +
+                '.signatures { margin-top: 35px; width: 100%; }' +
+                '.signatures table { width: 100%; border-collapse: collapse; }' +
+                '.signatures td { width: 50%; text-align: center; vertical-align: top; border: none !important; font-size: 11pt; font-weight: bold; }' +
+                '</style></head><body>' +
+                '<div class="doc">' +
+                    '<div class="header">' +
+                        '<table><tr>' +
+                            '<td class="right"><h1>وزارة التربية</h1><h2>المديرية العامة لتربية المثنى</h2></td>' +
+                            '<td class="center"><img class="logo" src="logo1.png" alt="اللوغو" onerror="this.style.display=\'none\'" /></td>' +
+                            '<td class="left"><h1>قسم الاعداد والتدريب</h1><h2>لوحة التحكم - إدارة النشاطات</h2></td>' +
+                        '</tr></table>' +
+                    '</div>' +
+                    '<div class="report-title-box">التقرير السنوي الموحد لجميع النشاطات ' + escapeHtml(yearLabel) + ' (جدول موحد مقسم حسب الشعب وموحد للنشاطات طيلة العام)</div>' +
+                    '<table class="info-table">' +
+                        '<tr>' +
+                            '<td class="lbl" style="width:14%;">السنة المحددة</td><td class="val" style="width:19%;">' + (data.selectedYear || 'جميع السنوات') + '</td>' +
+                            '<td class="lbl" style="width:14%;">تاريخ الإصدار</td><td class="val" style="width:19%;">' + todayStr + '</td>' +
+                            '<td class="lbl" style="width:14%;">عدد الشعب</td><td class="val">' + data.totalWorkplaces + '</td>' +
+                        '</tr>' +
+                        '<tr>' +
+                            '<td class="lbl">الأنشطة الموحدة</td><td class="val">' + data.totalUniqueActivities + '</td>' +
+                            '<td class="lbl">إجمالي التكرار السنوي</td><td class="val">' + data.grandOccurrences + ' نشاط</td>' +
+                            '<td class="lbl">إجمالي المتدربين</td><td class="val" style="color:#0e6251;">' + data.grandParticipants + ' متدرب/مشارك</td>' +
+                        '</tr>' +
+                    '</table>' +
+                    '<table class="main-table">' +
+                        '<thead><tr>' +
+                            '<th style="width:35px;">ت</th>' +
+                            '<th style="width:120px;">الشعبة / مكان العمل</th>' +
+                            '<th>اسم النشاط</th>' +
+                            '<th style="width:100px;">عدد النشاطات في السنة</th>' +
+                            '<th style="width:110px;">إجمالي المتدربين</th>' +
+                            '<th style="width:110px;">جهة التنفيذ</th>' +
+                            '<th style="width:110px;">الجهة المستهدفة</th>' +
+                            '<th style="width:120px;">الأشهر المنفذة</th>' +
+                            '<th>أبرز التفاصيل والملاحظات</th>' +
+                        '</tr></thead>' +
+                        '<tbody>' + rowsHtml + '</tbody>' +
+                    '</table>' +
+                    '<div class="signatures">' +
+                        '<table><tr>' +
+                            '<td><div>التوقيع : ...................................</div><div style="margin-top:10px;">مسؤولو الشعب</div></td>' +
+                            '<td><div>التوقيع : ...................................</div><div style="margin-top:10px;">مدير قسم الإعداد والتدريب</div><div style="margin-top:5px;">م.م صفاء هادي عبد العالي</div></td>' +
+                        '</tr></table>' +
+                    '</div>' +
+                '</div>' +
+                '</body></html>';
+
+            const blob = new Blob(['\ufeff' + wordDoc], { type: 'application/msword' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'التقرير_السنوي_الموحد_للنشاطات_' + (data.selectedYear || 'جميع_السنوات') + '.doc';
+            link.click();
+            showNotification('تم تصدير التقرير السنوي كملف Word بنجاح', 'success');
+        }
+
+        // =========================================================================
+        // طباعة التقرير السنوي الموحد
+        // =========================================================================
+        function printAdminAnnualReport() {
+            if (currentUserRole !== 'admin') { showNotification('غير مصرح!', 'error'); return; }
+            const data = getFilteredAdminAnnualData();
+            if (!data.workplaces.length) { showNotification('لا توجد بيانات للطباعة!', 'error'); return; }
+
+            const yearLabel = data.selectedYear ? ('لسنة ' + data.selectedYear) : 'طيلة العام (جميع السنوات)';
+            const monthsOrder = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
+            let counter = 1;
+            let rowsHtml = '';
+
+            data.workplaces.forEach(wpObj => {
+                const wp = wpObj.workplace;
+                rowsHtml += '<tr style="background:#1e3c72; color:#fff; font-weight:bold;">' +
+                    '<td colspan="9" style="text-align:right; padding:8px 12px; font-size:11pt;">' +
+                        '🏢 شعبة: ' + escapeHtml(wp) + ' | الأنشطة: ' + wpObj.activities.length + ' | إجمالي التكرار: ' + wpObj.occurrences + ' | المشتركين: ' + wpObj.participants +
+                    '</td>' +
+                '</tr>' +
+                '<tr style="background:#2c3e50; color:#fff;">' +
+                    '<th style="width:35px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">ت</th>' +
+                    '<th style="width:130px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">الشعبة / مكان العمل</th>' +
+                    '<th style="background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">اسم النشاط</th>' +
+                    '<th style="width:110px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">عدد النشاطات في السنة (التكرار)</th>' +
+                    '<th style="width:110px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">إجمالي المتدربين / المشاركين</th>' +
+                    '<th style="width:110px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">جهة التنفيذ</th>' +
+                    '<th style="width:110px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">الجهة المستهدفة</th>' +
+                    '<th style="width:120px; background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">الأشهر المنفذة</th>' +
+                    '<th style="background:#2c3e50; color:#fff; padding:6px 4px; font-size:10pt;">أبرز التفاصيل والملاحظات</th>' +
+                '</tr>';
+
+                wpObj.activities.forEach(act => {
+                    const sortedMonths = [...act.months].sort((a, b) => monthsOrder.indexOf(a) - monthsOrder.indexOf(b));
+                    const monthsText = sortedMonths.length ? sortedMonths.join(' ، ') : ([...act.dates].join(' ، ') || '-');
+                    const executorsText = [...act.executors].join(' ، ') || '-';
+                    const targetsText = [...act.targets].join(' ، ') || '-';
+                    let detailsArr = [...act.details].filter(Boolean);
+                    let notesArr = [...act.notes].filter(Boolean);
+                    let summaryText = '';
+                    if (detailsArr.length) summaryText += detailsArr.join(' | ');
+                    if (notesArr.length) {
+                        if (summaryText) summaryText += ' — ';
+                        summaryText += 'ملاحظات: ' + notesArr.join(' | ');
+                    }
+                    if (!summaryText) summaryText = '-';
+
+                    rowsHtml += '<tr>' +
+                        '<td>' + (counter++) + '</td>' +
+                        '<td>' + escapeHtml(wp) + '</td>' +
+                        '<td style="text-align:right; font-weight:bold;">' + escapeHtml(act.name) + '</td>' +
+                        '<td>' + act.count + '</td>' +
+                        '<td style="font-weight:bold;">' + act.participants + '</td>' +
+                        '<td>' + escapeHtml(executorsText) + '</td>' +
+                        '<td>' + escapeHtml(targetsText) + '</td>' +
+                        '<td>' + escapeHtml(monthsText) + '</td>' +
+                        '<td style="text-align:right; font-size:9pt;">' + escapeHtml(summaryText) + '</td>' +
+                    '</tr>';
+                });
+
+                rowsHtml += '<tr style="background:#f0f4f8; font-weight:bold;">' +
+                    '<td colspan="3" style="text-align:left;">مجموع شعبة (' + escapeHtml(wp) + '):</td>' +
+                    '<td>' + wpObj.occurrences + ' نشاط</td>' +
+                    '<td>' + wpObj.participants + ' متدرب</td>' +
+                    '<td colspan="4" style="text-align:right; font-size:9pt;">عدد الأنشطة: ' + wpObj.activities.length + '</td>' +
+                '</tr>';
+            });
+
+            rowsHtml += '<tr style="background:#1e3c72; color:#fff; font-weight:bold;">' +
+                '<td colspan="3" style="text-align:left; padding:8px;">المجموع الكلي العام لجميع الشعب:</td>' +
+                '<td style="padding:8px;">' + data.grandOccurrences + ' نشاط</td>' +
+                '<td style="padding:8px;">' + data.grandParticipants + ' متدرب/مشارك</td>' +
+                '<td colspan="4" style="text-align:right; padding:8px;">عدد الشعب: ' + data.totalWorkplaces + ' | إجمالي الأنشطة: ' + data.totalUniqueActivities + '</td>' +
+            '</tr>';
+
+            const printHtml = '<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>التقرير السنوي الموحد لجميع النشاطات</title>' +
+                '<style>' +
+                'body { font-family: Arial, sans-serif; padding: 15px; direction: rtl; font-size: 10pt; }' +
+                '.header { text-align: center; border-bottom: 2px solid #1e3c72; padding-bottom: 12px; margin-bottom: 15px; }' +
+                '.header h1 { color: #1e3c72; margin: 0 0 5px 0; font-size: 16pt; }' +
+                '.header h2 { margin: 0; font-size: 12pt; color: #333; }' +
+                '.meta { margin-bottom: 12px; background: #f8f9fa; padding: 8px 12px; border: 1px solid #ddd; font-size: 10pt; display: flex; justify-content: space-between; }' +
+                'table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }' +
+                'th, td { border: 1px solid #777; padding: 5px; text-align: center; font-size: 9.5pt; }' +
+                'thead { background: #1e3c72; color: #fff; }' +
+                '@page { size: A4 landscape; margin: 1cm; }' +
+                '</style></head><body>' +
+                '<div class="header"><h1>وزارة التربية - مديرية تربية المثنى</h1><h2>قسم الإعداد والتدريب - التقرير السنوي الموحد لجميع النشاطات ' + escapeHtml(yearLabel) + '</h2></div>' +
+                '<div class="meta"><span><strong>تاريخ الطباعة:</strong> ' + new Date().toLocaleString('ar-IQ') + '</span><span><strong>عدد الشعب:</strong> ' + data.totalWorkplaces + '</span><span><strong>إجمالي الأنشطة الموحدة:</strong> ' + data.totalUniqueActivities + '</span><span><strong>إجمالي التكرار:</strong> ' + data.grandOccurrences + '</span><span><strong>إجمالي المتدربين:</strong> ' + data.grandParticipants + '</span></div>' +
+                '<table><thead><tr><th style="width:35px;">ت</th><th>الشعبة</th><th>اسم النشاط</th><th>عدد النشاطات بالسنة</th><th>المتدربين</th><th>جهة التنفيذ</th><th>الجهة المستهدفة</th><th>الأشهر المنفذة</th><th>التفاصيل والملاحظات</th></tr></thead>' +
+                '<tbody>' + rowsHtml + '</tbody></table>' +
+                '<div style="margin-top:30px; display:flex; justify-content:space-between; font-weight:bold;">' +
+                    '<div style="width:45%; text-align:center;">مسؤولو الشعب<br><br>......................................</div>' +
+                    '<div style="width:45%; text-align:center;">مدير قسم الإعداد والتدريب<br>م.م صفاء هادي عبد العالي<br><br>......................................</div>' +
+                '</div>' +
+                '</body></html>';
+
+            const w = window.open('', '_blank');
+            w.document.write(printHtml);
+            w.document.close();
+            setTimeout(() => w.print(), 500);
         }
 
         async function deleteSingleActivityFromRecord(recordId, actIndex) {
